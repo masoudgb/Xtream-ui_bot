@@ -357,42 +357,48 @@ WantedBy=timers.target
 
 # Update script
 def update_bot():
+    install_path = "/opt/xtream-ui_bot"  # Path where the bot is installed
+
     try:
         print(Fore.GREEN + "Updating xtream-ui bot...")
 
-        # Backing up the .env file
+        # Ensure the install path exists
+        if not os.path.exists(install_path):
+            print(Fore.RED + f"Error: Installation path '{install_path}' does not exist.")
+            return
+
+        # Change to the installation directory
+        os.chdir(install_path)
+
+        # Back up the .env file
         if os.path.exists('.env'):
             print(Fore.YELLOW + "Backing up the .env file...")
-            os.rename('.env', '.env.bak')
+            os.rename('.env', '.env_backup')
 
-        # Check if the folder is a git repository
-        if os.path.exists(".git"):
-            # If it's a git repository, pull the latest changes
-            print(Fore.YELLOW + "Pulling the latest updates from GitHub...")
-            subprocess.run(['git', 'pull'], check=True)
-        else:
-            # If not, clean the directory and re-clone the repository
-            print(Fore.YELLOW + "Cleaning up old files...")
-            files = [f for f in os.listdir('.') if f != '.env.bak']
-            for f in files:
-                if os.path.isfile(f) or os.path.islink(f):
-                    os.unlink(f)
-                elif os.path.isdir(f):
-                    shutil.rmtree(f)
+        # Clean up old files (except .env_backup)
+        print(Fore.YELLOW + "Cleaning up old files...")
+        for item in os.listdir('.'):
+            if item not in ['.env_backup']:
+                if os.path.isdir(item):
+                    rmtree(item)
+                else:
+                    os.remove(item)
 
-            # Clone the repository
-            print(Fore.YELLOW + "Downloading the latest files from GitHub...")
-            subprocess.run(['git', 'clone', 'https://github.com/masoudgb/Xtream-ui_bot.git', '.'], check=True)
+        # Clone the latest version from GitHub
+        print(Fore.YELLOW + "Downloading the latest files from GitHub...")
+        subprocess.run(['git', 'clone', 'https://github.com/masoudgb/Xtream-ui_bot.git', '.'], check=True)
 
         # Restore the .env file
-        if os.path.exists('.env.bak'):
+        if os.path.exists('.env_backup'):
             print(Fore.YELLOW + "Restoring the .env file...")
-            os.rename('.env.bak', '.env')
+            os.rename('.env_backup', '.env')
 
         print(Fore.GREEN + "Update completed successfully.")
     except Exception as e:
         print(Fore.RED + f"Error during update: {str(e)}")
-
+        # Restore .env if backup exists
+        if os.path.exists('.env_backup'):
+            os.rename('.env_backup', '.env')
     main()
 
 # Unistall
