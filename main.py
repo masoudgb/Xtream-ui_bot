@@ -124,7 +124,7 @@ def install_bot():
         env_file.write(f"CHANNEL_1_LINK={channel_1_link}\n")
 
     print(Fore.GREEN + "Installation completed successfully.")
-    print(Fore.YELLOW + "To send a message, refer to the sending schedule section in Managing xtream-ui bot")
+    print(Fore.YELLOW + "To send a message, refer to the sending schedule section in Manage xtream-ui bot/Manage Post Timing")
     
     # Return to the main menu after installation
     main()
@@ -395,17 +395,66 @@ def update_bot():
 
     main()
 
-# حذف ربات
+# Unistall
+
 def uninstall_bot():
-    print(Fore.GREEN + "Uninstalling xtream-ui bot...")
-    # اینجا می‌توانید کد حذف را اضافه کنید
+    # Confirm uninstallation
+    confirmation = input(Fore.RED + "Are you sure you want to uninstall xtream-ui bot? (y/n): ").strip().lower()
+    if confirmation != "y":
+        print(Fore.YELLOW + "Uninstallation cancelled.")
+        main()
+        return  # Exit the uninstall function
+
+    try:
+        print(Fore.RED + "Uninstalling xtream-ui bot...")
+
+        # Stop and disable the systemd service if it exists
+        service_name = "xtream-ui_bot.service"
+        timer_name = "xtream-ui_bot.timer"
+
+        print(Fore.YELLOW + "Stopping and disabling the bot service...")
+        subprocess.run(['systemctl', 'stop', service_name], check=False)
+        subprocess.run(['systemctl', 'disable', service_name], check=False)
+        subprocess.run(['systemctl', 'stop', timer_name], check=False)
+        subprocess.run(['systemctl', 'disable', timer_name], check=False)
+
+        # Remove the service and timer files
+        print(Fore.YELLOW + "Removing service and timer files...")
+        service_file_path = f"/etc/systemd/system/{service_name}"
+        timer_file_path = f"/etc/systemd/system/{timer_name}"
+        if os.path.exists(service_file_path):
+            os.remove(service_file_path)
+        if os.path.exists(timer_file_path):
+            os.remove(timer_file_path)
+
+        # Reload systemd daemon
+        subprocess.run(['systemctl', 'daemon-reload'], check=False)
+
+        # Remove the bot directory
+        print(Fore.YELLOW + "Removing bot files from /opt/xtream-ui_bot...")
+        bot_directory = "/opt/xtream-ui_bot"
+        if os.path.exists(bot_directory):
+            shutil.rmtree(bot_directory)
+
+        # Remove the .env file and its backup if they exist
+        print(Fore.YELLOW + "Removing .env file and backups...")
+        env_file = os.path.join(os.getcwd(), ".env")
+        env_backup_file = os.path.join(os.getcwd(), ".env.bak")
+        if os.path.exists(env_file):
+            os.remove(env_file)
+        if os.path.exists(env_backup_file):
+            os.remove(env_backup_file)
+
+        print(Fore.GREEN + "Uninstallation completed successfully.")
+    except Exception as e:
+        print(Fore.RED + f"Error during uninstallation: {str(e)}")
+
     main()
 
-# خروج از برنامه
+# Exit
 def exit_program():
     print(Fore.GREEN + "Exiting...")
     exit()
 
-# اجرای برنامه
 if __name__ == "__main__":
     main()
