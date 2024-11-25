@@ -4,7 +4,8 @@ import os
 import logging
 from core.api_client import get_vod_data, get_vod_info, get_vod_categories
 from core.telegram import send_photo_to_telegram
-from config.config import DEFAULT_COVER_IMAGE  # Importing default cover from config.py
+from config.config import DEFAULT_VOD_COVER_URL  # Importing default cover for VOD
+from config.config import CHANNELS  # Importing channels from config
 
 # Path to the JSON file for storing sent movie IDs
 MOVIES_FILE = "movies.json"
@@ -68,7 +69,7 @@ def notify_for_vod(vod_id, vod_name, vod_info, vod_cover, category_id, categorie
         f"🔗 Channel Link: <a href='{CHANNEL_LINK}'>Here</a>"
     )
 
-    vod_image = vod_cover if vod_cover else DEFAULT_COVER_IMAGE
+    vod_image = vod_cover if vod_cover else DEFAULT_VOD_COVER_URL
 
     # Send to Telegram
     if send_to_telegram_with_retry(vod_image, caption, TELEGRAM_TOKEN, CHANNEL_ID):
