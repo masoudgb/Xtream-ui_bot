@@ -357,52 +357,41 @@ WantedBy=timers.target
 
 # Update script
 def update_bot():
-    """
-    Update the bot by pulling the latest files from GitHub while preserving the .env file.
-    """
-    print(Fore.CYAN + "Updating xtream-ui bot...")
-    
-    # Check if the project directory is in /opt
-    project_path = "/opt/xtream-ui_bot"
-    if not os.path.exists(project_path):
-        print(Fore.RED + f"Error: Project not found in {project_path}. Please install the bot first.")
-        return
-
     try:
-        # Navigate to the project directory
-        os.chdir(project_path)
+        print(Fore.GREEN + "Updating xtream-ui bot...")
 
-        # Backup the .env file
-        env_path = os.path.join(project_path, ".env")
-        if os.path.exists(env_path):
+        # Backing up the .env file
+        if os.path.exists('.env'):
             print(Fore.YELLOW + "Backing up the .env file...")
-            shutil.copy(env_path, "/tmp/.env_backup")
+            os.rename('.env', '.env.bak')
+
+        # Check if the folder is a git repository
+        if os.path.exists(".git"):
+            # If it's a git repository, pull the latest changes
+            print(Fore.YELLOW + "Pulling the latest updates from GitHub...")
+            subprocess.run(['git', 'pull'], check=True)
         else:
-            print(Fore.YELLOW + "No .env file found to back up.")
+            # If not, clean the directory and re-clone the repository
+            print(Fore.YELLOW + "Cleaning up old files...")
+            files = [f for f in os.listdir('.') if f != '.env.bak']
+            for f in files:
+                if os.path.isfile(f) or os.path.islink(f):
+                    os.unlink(f)
+                elif os.path.isdir(f):
+                    shutil.rmtree(f)
 
-        # Remove all files except the .env file
-        print(Fore.YELLOW + "Cleaning up old files...")
-        for item in os.listdir(project_path):
-            item_path = os.path.join(project_path, item)
-            if os.path.isdir(item_path):
-                shutil.rmtree(item_path)
-            elif os.path.isfile(item_path) and item != ".env":
-                os.remove(item_path)
-
-        # Clone the latest project files from GitHub
-        print(Fore.YELLOW + "Downloading the latest files from GitHub...")
-        subprocess.run(["git", "clone", "git@github.com:masoudgb/Xtream-ui_bot.git", "."], check=True)
+            # Clone the repository
+            print(Fore.YELLOW + "Downloading the latest files from GitHub...")
+            subprocess.run(['git', 'clone', 'https://github.com/masoudgb/Xtream-ui_bot.git', '.'], check=True)
 
         # Restore the .env file
-        if os.path.exists("/tmp/.env_backup"):
+        if os.path.exists('.env.bak'):
             print(Fore.YELLOW + "Restoring the .env file...")
-            shutil.move("/tmp/.env_backup", env_path)
+            os.rename('.env.bak', '.env')
 
         print(Fore.GREEN + "Update completed successfully.")
-    except subprocess.CalledProcessError as e:
-        print(Fore.RED + f"Error during update: {str(e)}")
     except Exception as e:
-        print(Fore.RED + f"An unexpected error occurred: {str(e)}")
+        print(Fore.RED + f"Error during update: {str(e)}")
 
     main()
 
