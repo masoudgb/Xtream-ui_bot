@@ -1,5 +1,5 @@
 import os
-from shutil import rmtree
+import shutil import rmtree
 import subprocess
 from colorama import Fore, init
 
@@ -380,13 +380,13 @@ def update_bot():
         for item in os.listdir('.'):
             if item not in ['.env_backup']:
                 if os.path.isdir(item):
-                    rmtree(item)
+                    rmtree(item)  # Correctly using rmtree to delete directories
                 else:
                     os.remove(item)
 
-        # Clone the latest version from GitHub
-        print(Fore.YELLOW + "Downloading the latest files from GitHub...")
-        subprocess.run(['git', 'clone', 'https://github.com/masoudgb/Xtream-ui_bot.git', '.'], check=True)
+        # Use git pull instead of git clone to update the files
+        print(Fore.YELLOW + "Pulling the latest files from GitHub...")
+        subprocess.run(['git', 'pull'], check=True)
 
         # Restore the .env file
         if os.path.exists('.env_backup'):
