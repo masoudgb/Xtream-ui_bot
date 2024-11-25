@@ -70,6 +70,7 @@ def compare_and_notify(series_id, series_name, new_episodes, old_episodes, serie
                     f"🔗 Channel Link: <a href='{channel_link}'>Here</a>"
                 )
 
+                # Use the series cover or default cover if none is available
                 series_image = series_cover if series_cover else DEFAULT_SERIES_COVER
 
                 # Send to Telegram
