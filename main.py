@@ -109,7 +109,8 @@ def display_main_menu():
         print(colored("2. Manage Script", "green"))
         print(colored("3. Remove Script", "green"))
         print(colored("4. Update Script", "green"))
-        print(colored("5. Exit", "green"))
+        print(colored("5. Manage Channels", "green"))
+        print(colored("6. Exit", "green"))
 
         choice = input(colored("Enter your choice: ", "green"))
 
@@ -122,10 +123,147 @@ def display_main_menu():
         elif choice == "4":
             update_script()
         elif choice == "5":
+            manage_channels_menu()  # Call a separate menu for channel management
+        elif choice == "6":
             print(colored("Exiting the script. Goodbye!", "green"))
             sys.exit(0)
         else:
             print(colored("Invalid choice. Please try again.", "red"))
+
+# Channel Management Menu
+def manage_channels_menu():
+    """Menu for managing channels."""
+    while True:
+        print("\n" + "=" * 30)
+        print(colored("Channel Management", "blue"))
+        print("=" * 30)
+        print("1. Add a New Channel")
+        print("2. Stop Sending to a Channel")
+        print("3. Reactivate a Stopped Channel")
+        print("4. Delete a Channel")
+        print("5. Back to Main Menu")
+        print("=" * 30)
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            add_new_channel()
+        elif choice == "2":
+            stop_channel()
+        elif choice == "3":
+            reactivate_channel()
+        elif choice == "4":
+            delete_channel()
+        elif choice == "5":
+            print(colored("Returning to main menu...", 'yellow'))
+            break
+        else:
+            print(colored("Invalid choice. Please try again.", 'red'))
+
+# Add New Channel
+def add_new_channel():
+    """Add a new channel to the .env file."""
+    env_data = load_env_file()
+    channel_count = len([key for key in env_data if key.startswith("CHANNEL_") and key.endswith("_ID")])
+
+    while True:
+        channel_id = input("Enter the new channel ID: ").strip()
+        channel_link = input("Enter the new channel link: ").strip()
+
+        env_data[f"CHANNEL_{channel_count + 1}_ID"] = channel_id
+        env_data[f"CHANNEL_{channel_count + 1}_LINK"] = channel_link
+        channel_count += 1
+
+        save_env_file(env_data)
+        print(colored("Channel added successfully!", 'green'))
+
+        more_channels = input("Do you want to add another channel? (y/n): ").strip().lower()
+        if more_channels != "y":
+            break
+
+# Stop Channel
+def stop_channel():
+    """Stop sending to a channel by commenting it out in the .env file."""
+    env_data = load_env_file()
+    channel_ids = {i + 1: key for i, key in enumerate(env_data) if key.startswith("CHANNEL_") and key.endswith("_ID")}
+
+    print("\nList of Channels:")
+    for index, channel_id in channel_ids.items():
+        print(f"{index}. {env_data[channel_id]}")
+
+    while True:
+        choice = int(input("\nEnter the number of the channel to stop: "))
+        if choice in channel_ids:
+            channel_id_key = channel_ids[choice]
+            channel_link_key = channel_id_key.replace("_ID", "_LINK")
+
+            env_data[channel_id_key] = f"#{env_data[channel_id_key]}"
+            env_data[channel_link_key] = f"#{env_data[channel_link_key]}"
+
+            save_env_file(env_data)
+            print(colored("Channel stopped successfully!", 'green'))
+        else:
+            print(colored("Invalid choice. Please try again.", 'red'))
+
+        more_channels = input("Do you want to stop another channel? (y/n): ").strip().lower()
+        if more_channels != "y":
+            break
+
+# Reactivate Channel
+def reactivate_channel():
+    """Reactivate a stopped channel by uncommenting it in the .env file."""
+    env_data = load_env_file()
+    stopped_channels = {i + 1: key for i, key in enumerate(env_data) if key.startswith("#CHANNEL_") and key.endswith("_ID")}
+
+    print("\nList of Stopped Channels:")
+    for index, channel_id in stopped_channels.items():
+        print(f"{index}. {env_data[channel_id]}")
+
+    while True:
+        choice = int(input("\nEnter the number of the channel to reactivate: "))
+        if choice in stopped_channels:
+            channel_id_key = stopped_channels[choice]
+            channel_link_key = channel_id_key.replace("_ID", "_LINK")
+
+            env_data[channel_id_key] = env_data[channel_id_key][1:]  # Remove "#"
+            env_data[channel_link_key] = env_data[channel_link_key][1:]  # Remove "#"
+
+            save_env_file(env_data)
+            print(colored("Channel reactivated successfully!", 'green'))
+        else:
+            print(colored("Invalid choice. Please try again.", 'red'))
+
+        more_channels = input("Do you want to reactivate another channel? (y/n): ").strip().lower()
+        if more_channels != "y":
+            break
+
+# Delete Channel
+def delete_channel():
+    """Delete a channel from the .env file."""
+    env_data = load_env_file()
+    channel_ids = {i + 1: key for i, key in enumerate(env_data) if key.startswith("CHANNEL_") and key.endswith("_ID")}
+
+    print("\nList of Channels:")
+    for index, channel_id in channel_ids.items():
+        print(f"{index}. {env_data[channel_id]}")
+
+    while True:
+        choice = int(input("\nEnter the number of the channel to delete: "))
+        if choice in channel_ids:
+            channel_id_key = channel_ids[choice]
+            channel_link_key = channel_id_key.replace("_ID", "_LINK")
+
+            del env_data[channel_id_key]
+            del env_data[channel_link_key]
+
+            save_env_file(env_data)
+            print(colored("Channel deleted successfully!", 'green'))
+        else:
+            print(colored("Invalid choice. Please try again.", 'red'))
+
+        more_channels = input("Do you want to delete another channel? (y/n): ").strip().lower()
+        if more_channels != "y":
+            break
             
 # 6. Manage Script
 def manage_script():
