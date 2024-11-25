@@ -1,5 +1,5 @@
 import os
-import shutil import rmtree
+from shutil import rmtree
 import subprocess
 from colorama import Fore, init
 
