@@ -4,7 +4,7 @@ import os
 import logging
 from core.api_client import get_series_data, get_series_info, get_categories
 from core.telegram import send_photo_to_telegram
-from config.config import DEFAULT_SERIES_COVER  # Importing default cover from config.py
+from config.config import DEFAULT_SERIES_COVER_URL  # Importing default cover from config.py
 
 # Path to the JSON file for storing sent series data
 SERIES_FILE = "series.json"
