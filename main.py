@@ -1,297 +1,422 @@
-# 1. Import Dependencies
 import os
-import sys
+import shutil
 import subprocess
-import logging
-from termcolor import colored
-from dotenv import load_dotenv
-from core.vod_handler import check_and_notify_new_vod
-from core.series_handler import check_and_notify_new_series
+from colorama import Fore, init
 
-# Install/upgrade pip and dependencies
-def install_or_update_dependencies():
+init(autoreset=True)
+
+def check_root():
+    """
+    Verify if the script is executed with root privileges.
+    """
+    if os.geteuid() != 0:
+        print(Fore.RED + "Error: You need to run this script as root!")
+        exit(1)
+
+# Install prerequisites
+def install_prerequisites():
+    """
+    Update the server and install required packages and libraries.
+    """
+    print(Fore.CYAN + "Updating server and installing prerequisites...")
+
     try:
-        print(colored("Checking and upgrading pip...", "green"))
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
-        print(colored("Pip upgraded successfully.", "cyan"))
+        # Update the package list
+        print(Fore.YELLOW + "Updating package list...")
+        subprocess.run(["apt", "update", "-y"], check=True)
 
-        print(colored("Installing required packages from requirements.txt...", "green"))
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
-        print(colored("Dependencies installed successfully.", "cyan"))
-    except Exception as e:
-        print(colored(f"Error installing dependencies: {e}", "red"))
-        sys.exit(1)
+        # Install Python3 and pip
+        print(Fore.YELLOW + "Installing Python3 and pip...")
+        subprocess.run(["apt", "install", "python3-pip", "-y"], check=True)
 
-# Install dependencies on script start
-install_or_update_dependencies()
+        # Install required Python libraries
+        print(Fore.YELLOW + "Installing required Python libraries...")
+        required_libraries = [
+            "python-telegram-bot",
+            "termcolor",
+            "python-dotenv",
+            "requests"
+        ]
+        for lib in required_libraries:
+            print(Fore.YELLOW + f"Installing {lib}...")
+            subprocess.run(["pip3", "install", lib], check=True)
 
-# 2. Load Configuration
-load_dotenv()
+        print(Fore.GREEN + "All prerequisites have been successfully installed.")
+    except subprocess.CalledProcessError as e:
+        print(Fore.RED + f"Error installing prerequisites: {str(e)}")
+        exit(1)
 
-API_URL = os.getenv("API_URL")
-USERNAME = os.getenv("USERNAME")
-PASSWORD = os.getenv("PASSWORD")
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-DEFAULT_VOD_COVER_URL = os.getenv("DEFAULT_VOD_COVER_URL")
-DEFAULT_SERIES_COVER_URL = os.getenv("DEFAULT_SERIES_COVER_URL")
+# Move project to /opt
+def setup_project_in_opt():
+    """
+    Ensure the project is located in /opt and navigate to the correct directory.
+    """
+    current_path = os.getcwd()  # Get the current working directory
+    target_path = "/opt/xtream-ui_bot"
 
-# Parse channels
-CHANNELS = []
-channel_index = 1
-while True:
-    channel_id = os.getenv(f"CHANNEL_{channel_index}_ID")
-    channel_link = os.getenv(f"CHANNEL_{channel_index}_LINK")
-    if not channel_id or not channel_link:
-        break
-    CHANNELS.append({"id": channel_id, "link": channel_link})
-    channel_index += 1
+    if current_path != target_path:
+        try:
+            # Check if the /opt directory already contains the project
+            if not os.path.exists(target_path):
+                print(Fore.YELLOW + "Moving project files to /opt...")
+                shutil.move(current_path, target_path)  # Move the project to /opt
+            # Change the current directory to /opt/xtream-ui_bot
+            os.chdir(target_path)
+            print(Fore.GREEN + f"Successfully moved to and set up in {target_path}.")
+        except Exception as e:
+            print(Fore.RED + f"Error moving project to /opt: {str(e)}")
+            exit(1)
+    else:
+        print(Fore.GREEN + f"Project is already located in {target_path}.")
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+# Installation process
+def install_bot():
+    """
+    Handles the installation process of xtream-ui bot.
+    """
+    print(Fore.GREEN + "Installing xtream-ui bot...")
 
-# 3. Notification Functions
-# Sends VOD data to all channels
-def send_to_all_channels_for_vod():
-    try:
-        check_and_notify_new_vod(API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHANNELS, DEFAULT_VOD_COVER_URL)
-        print(colored("VOD notifications sent successfully.", "cyan"))
-    except Exception as e:
-        print(colored(f"Error sending VOD notifications: {str(e)}", "red"))
+    # Check for root privileges
+    check_root()
 
-# Sends Series data to all channels
-def send_to_all_channels_for_series():
-    try:
-        check_and_notify_new_series(API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHANNELS, DEFAULT_SERIES_COVER_URL)
-        print(colored("Series notifications sent successfully.", "cyan"))
-    except Exception as e:
-        print(colored(f"Error sending Series notifications: {str(e)}", "red"))
-        
-# 4. Installation Process
-def install_script():
-    print(colored("Starting installation...", "green"))
+    # Install prerequisites
+    install_prerequisites()
 
-    # Gather user input
-    api_url = input(colored("Enter the API server URL (e.g., http://example.com:8080): ", "green"))
-    username = input(colored("Enter the API username: ", "green"))
-    password = input(colored("Enter the API password: ", "green"))
-    telegram_token = input(colored("Enter the Telegram bot token: ", "green"))
-    default_vod_cover_url = input(colored("Enter the default film cover URL: ", "green"))
-    default_series_cover_url = input(colored("Enter the default series cover URL: ", "green"))
+    # Move the project to /opt
+    setup_project_in_opt()
 
-    # Gather channels
-    channels = []
-    while True:
-        channel_id = input(colored("Enter a Telegram channel ID (or press Enter to finish): ", "green"))
-        if not channel_id:
-            break
-        channel_link = input(colored("Enter the channel link: ", "green"))
-        channels.append({"id": channel_id, "link": channel_link})
+    # Prompt the user for environment variables
+    print(Fore.WHITE + "Please enter the following information:")
 
-    # Write to .env file
-    with open(".env", "w") as env_file:
+    # API Information
+    api_url = input(Fore.WHITE + "Enter the API URL (e.g., http://myserver.com:8080): ")
+    username = input(Fore.WHITE + "Enter the Username: ")
+    password = input(Fore.WHITE + "Enter the Password: ")
+
+    # Telegram Information
+    telegram_token = input(Fore.WHITE + "Enter Your Telegram Bot Token: ")
+
+    # Default Cover URLs
+    default_vod_cover_url = input(Fore.WHITE + "Default VOD Cover URL: ")
+    default_series_cover_url = input(Fore.WHITE + "Default Series Cover URL: ")
+
+    # Channels Information
+    channel_1_id = input(Fore.WHITE + "Enter Channel ID (e.g., @mychannel): ")
+    channel_1_link = input(Fore.WHITE + "Enter the Channel Link (e.g., https://t.me/mychannel): ")
+
+    # Create or write the .env file
+    env_path = os.path.join(os.getcwd(), '.env')
+    with open(env_path, 'w') as env_file:
+        env_file.write(f"# API Information\n")
         env_file.write(f"API_URL={api_url}\n")
         env_file.write(f"USERNAME={username}\n")
-        env_file.write(f"PASSWORD={password}\n")
-        env_file.write(f"TELEGRAM_TOKEN={telegram_token}\n")
+        env_file.write(f"PASSWORD={password}\n\n")
+        
+        env_file.write(f"# Telegram Information\n")
+        env_file.write(f"TELEGRAM_TOKEN={telegram_token}\n\n")
+        
+        env_file.write(f"# Default Cover URLs\n")
         env_file.write(f"DEFAULT_VOD_COVER_URL={default_vod_cover_url}\n")
-        env_file.write(f"DEFAULT_SERIES_COVER_URL={default_series_cover_url}\n")
-        for index, channel in enumerate(channels, start=1):
-            env_file.write(f"CHANNEL_{index}_ID={channel['id']}\n")
-            env_file.write(f"CHANNEL_{index}_LINK={channel['link']}\n")
+        env_file.write(f"DEFAULT_SERIES_COVER_URL={default_series_cover_url}\n\n")
+        
+        env_file.write(f"# Channels Information\n")
+        env_file.write(f"CHANNEL_1_ID={channel_1_id}\n")
+        env_file.write(f"CHANNEL_1_LINK={channel_1_link}\n")
 
-    print(colored("Installation completed successfully!", "cyan"))
+    print(Fore.GREEN + "Installation completed successfully.")
+    print(Fore.YELLOW + "To send a message, refer to the sending schedule section in Managing xtream-ui bot")
     
-# 5. Main Menu
-def display_main_menu():
-    while True:
-        print(colored("\nMain Menu:", "green"))
-        print(colored("1. Install Script", "green"))
-        print(colored("2. Manage Script", "green"))
-        print(colored("3. Remove Script", "green"))
-        print(colored("4. Update Script", "green"))
-        print(colored("5. Manage Channels", "green"))
-        print(colored("6. Exit", "green"))
+    # Return to the main menu after installation
+    main()
 
-        choice = input(colored("Enter your choice: ", "green"))
+# Main menu
+def main():
+    """
+    Main menu for the bot setup and management.
+    """
+    print(Fore.CYAN + "xtream-ui bot powered by masoud_gb")
+    
+    # Display options with green text and white numbers
+    print(Fore.WHITE + "1." + Fore.GREEN + " Install xtream-ui bot")
+    print(Fore.WHITE + "2." + Fore.GREEN + " Manage xtream-ui bot")
+    print(Fore.WHITE + "3." + Fore.GREEN + " Update xtream-ui bot")
+    print(Fore.WHITE + "4." + Fore.GREEN + " Uninstall")
+    print(Fore.WHITE + "5." + Fore.GREEN + " Exit")
+    
+    # Get user input
+    choice = input(Fore.WHITE + "Please choose an option: ")
+    
+    if choice == "1":
+        install_bot()
+    elif choice == "2":
+        manage_bot()
+    elif choice == "3":
+        update_bot()
+    elif choice == "4":
+        uninstall_bot()
+    elif choice == "5":
+        exit_program()
+    else:
+        print(Fore.RED + "Invalid option, please try again.")
+        main()
 
-        if choice == "1":
-            install_script()
-        elif choice == "2":
-            manage_script()
-        elif choice == "3":
-            remove_script()
-        elif choice == "4":
-            update_script()
-        elif choice == "5":
-            manage_channels_menu()  # Call a separate menu for channel management
-        elif choice == "6":
-            print(colored("Exiting the script. Goodbye!", "green"))
-            sys.exit(0)
-        else:
-            print(colored("Invalid choice. Please try again.", "red"))
+# Main menu
+def main():
+    """
+    Main menu for the bot setup and management.
+    """
+    print(Fore.CYAN + "xtream-ui bot powered by masoud_gb")
+    
+    # Display options with green text and white numbers
+    print(Fore.WHITE + "1." + Fore.GREEN + " Install xtream-ui bot")
+    print(Fore.WHITE + "2." + Fore.GREEN + " Manage xtream-ui bot")
+    print(Fore.WHITE + "3." + Fore.GREEN + " Update xtream-ui bot")
+    print(Fore.WHITE + "4." + Fore.GREEN + " Uninstall")
+    print(Fore.WHITE + "5." + Fore.GREEN + " Exit")
+    
+    # Get user input
+    choice = input(Fore.WHITE + "Please choose an option: ")
+    
+    if choice == "1":
+        install_bot()
+    elif choice == "2":
+        manage_bot()
+    elif choice == "3":
+        update_bot()
+    elif choice == "4":
+        uninstall_bot()
+    elif choice == "5":
+        exit_program()
+    else:
+        print(Fore.RED + "Invalid option, please try again.")
+        main()
+        
+# Magageing bot
+def manage_bot():
+    print(Fore.GREEN + "Managing xtream-ui bot...")
 
-# Channel Management Menu
-def manage_channels_menu():
-    """Menu for managing channels."""
-    while True:
-        print("\n" + "=" * 30)
-        print(colored("Channel Management", "blue"))
-        print("=" * 30)
-        print("1. Add a New Channel")
-        print("2. Stop Sending to a Channel")
-        print("3. Reactivate a Stopped Channel")
-        print("4. Delete a Channel")
-        print("5. Back to Main Menu")
-        print("=" * 30)
+def manage_bot():
+    print(Fore.WHITE + "Manage xtream-ui bot:")
+    print(Fore.WHITE + "1." + Fore.GREEN + " Manage Channels")
+    print(Fore.WHITE + "2." + Fore.GREEN + " Manage Post Timing")
+    
+    choice = input(Fore.WHITE + "Choose an option: ")
+    
+    if choice == "1":
+        manage_channels()
+    elif choice == "2":
+        manage_post_timing()
+    else:
+        print(Fore.RED + "Invalid option, returning to main menu.")
+        main()
 
-        choice = input("Enter your choice: ")
+# Channel management
+def manage_channels():
+    print(Fore.GREEN + "Manage Channels:")
+    print(Fore.WHITE + "1." + Fore.GREEN + " Add Channel")
+    print(Fore.WHITE + "2." + Fore.GREEN + " Stop Sending to Channel")
+    print(Fore.WHITE + "3." + Fore.GREEN + " Resume Sending to Channel")
+    print(Fore.WHITE + "4." + Fore.GREEN + " Remove Channel")
+    
+    choice = input(Fore.WHITE + "Please Choose an option: ")
+    
+    if choice == "1":
+        add_channel()
+    elif choice == "2":
+        stop_channel()
+    elif choice == "3":
+        resume_channel()
+    elif choice == "4":
+        remove_channel()
+    else:
+        print(Fore.RED + "Invalid option, returning to manage menu.")
+        manage_bot()
 
-        if choice == "1":
-            add_new_channel()
-        elif choice == "2":
-            stop_channel()
-        elif choice == "3":
-            reactivate_channel()
-        elif choice == "4":
-            delete_channel()
-        elif choice == "5":
-            print(colored("Returning to main menu...", 'yellow'))
-            break
-        else:
-            print(colored("Invalid choice. Please try again.", 'red'))
+# 1.1 Add Channel
+def add_channel():
+    # Read current channel index from the .env file
+    channel_index = 1
+    try:
+        with open('.env', 'r') as env_file:
+            for line in env_file:
+                if line.startswith(f"CHANNEL_{channel_index}_ID="):
+                    channel_index += 1
+    except FileNotFoundError:
+        print(Fore.YELLOW + ".env file not found. It will be created.")
+    
+    # Get channel information from user
+    channel_id = input(Fore.WHITE + "Enter Channel ID (e.g., @mychannel): ")
+    channel_link = input(Fore.WHITE + "Enter Channel Link (e.g., https://t.me/mychannel): ")
+    
+    # Append channel information to the .env file
+    with open('.env', 'a') as env_file:
+        env_file.write(f"CHANNEL_{channel_index}_ID={channel_id}\n")
+        env_file.write(f"CHANNEL_{channel_index}_LINK={channel_link}\n")
+    
+    print(Fore.GREEN + f"Channel added successfully as CHANNEL_{channel_index}.")
+    manage_channels()
 
-# Add New Channel
-def add_new_channel():
-    """Add a new channel to the .env file."""
-    env_data = load_env_file()
-    channel_count = len([key for key in env_data if key.startswith("CHANNEL_") and key.endswith("_ID")])
-
-    while True:
-        channel_id = input("Enter the new channel ID: ").strip()
-        channel_link = input("Enter the new channel link: ").strip()
-
-        env_data[f"CHANNEL_{channel_count + 1}_ID"] = channel_id
-        env_data[f"CHANNEL_{channel_count + 1}_LINK"] = channel_link
-        channel_count += 1
-
-        save_env_file(env_data)
-        print(colored("Channel added successfully!", 'green'))
-
-        more_channels = input("Do you want to add another channel? (y/n): ").strip().lower()
-        if more_channels != "y":
-            break
-
-# Stop Channel
+# 1.2 Stop sending to a channel
 def stop_channel():
-    """Stop sending to a channel by commenting it out in the .env file."""
-    env_data = load_env_file()
-    channel_ids = {i + 1: key for i, key in enumerate(env_data) if key.startswith("CHANNEL_") and key.endswith("_ID")}
+    modify_channel_status("stop")
 
-    print("\nList of Channels:")
-    for index, channel_id in channel_ids.items():
-        print(f"{index}. {env_data[channel_id]}")
+# 1.3 Resume sending to a channel
+def resume_channel():
+    modify_channel_status("resume")
 
-    while True:
-        choice = int(input("\nEnter the number of the channel to stop: "))
-        if choice in channel_ids:
-            channel_id_key = channel_ids[choice]
-            channel_link_key = channel_id_key.replace("_ID", "_LINK")
+# 1.4 Remove a channel
+def remove_channel():
+    modify_channel_status("remove")
 
-            env_data[channel_id_key] = f"#{env_data[channel_id_key]}"
-            env_data[channel_link_key] = f"#{env_data[channel_link_key]}"
-
-            save_env_file(env_data)
-            print(colored("Channel stopped successfully!", 'green'))
-        else:
-            print(colored("Invalid choice. Please try again.", 'red'))
-
-        more_channels = input("Do you want to stop another channel? (y/n): ").strip().lower()
-        if more_channels != "y":
-            break
-
-# Reactivate Channel
-def reactivate_channel():
-    """Reactivate a stopped channel by uncommenting it in the .env file."""
-    env_data = load_env_file()
-    stopped_channels = {i + 1: key for i, key in enumerate(env_data) if key.startswith("#CHANNEL_") and key.endswith("_ID")}
-
-    print("\nList of Stopped Channels:")
-    for index, channel_id in stopped_channels.items():
-        print(f"{index}. {env_data[channel_id]}")
-
-    while True:
-        choice = int(input("\nEnter the number of the channel to reactivate: "))
-        if choice in stopped_channels:
-            channel_id_key = stopped_channels[choice]
-            channel_link_key = channel_id_key.replace("_ID", "_LINK")
-
-            env_data[channel_id_key] = env_data[channel_id_key][1:]  # Remove "#"
-            env_data[channel_link_key] = env_data[channel_link_key][1:]  # Remove "#"
-
-            save_env_file(env_data)
-            print(colored("Channel reactivated successfully!", 'green'))
-        else:
-            print(colored("Invalid choice. Please try again.", 'red'))
-
-        more_channels = input("Do you want to reactivate another channel? (y/n): ").strip().lower()
-        if more_channels != "y":
-            break
-
-# Delete Channel
-def delete_channel():
-    """Delete a channel from the .env file."""
-    env_data = load_env_file()
-    channel_ids = {i + 1: key for i, key in enumerate(env_data) if key.startswith("CHANNEL_") and key.endswith("_ID")}
-
-    print("\nList of Channels:")
-    for index, channel_id in channel_ids.items():
-        print(f"{index}. {env_data[channel_id]}")
-
-    while True:
-        choice = int(input("\nEnter the number of the channel to delete: "))
-        if choice in channel_ids:
-            channel_id_key = channel_ids[choice]
-            channel_link_key = channel_id_key.replace("_ID", "_LINK")
-
-            del env_data[channel_id_key]
-            del env_data[channel_link_key]
-
-            save_env_file(env_data)
-            print(colored("Channel deleted successfully!", 'green'))
-        else:
-            print(colored("Invalid choice. Please try again.", 'red'))
-
-        more_channels = input("Do you want to delete another channel? (y/n): ").strip().lower()
-        if more_channels != "y":
-            break
-            
-# 6. Manage Script
-def manage_script():
-    print(colored("Manage Script (Functionality to be implemented)", "blue"))
-
-# 7. Remove Script
-def remove_script():
-    print(colored("Removing Script (Functionality to be implemented)", "blue"))
-
-# 8. Update Script
-def update_script():
-    print(colored("Updating Script (Functionality to be implemented)", "blue"))
+# Modify channel status (stop, resume, or remove)
+def modify_channel_status(action):
+    channels = {}
+    with open('.env', 'r') as env_file:
+        lines = env_file.readlines()
     
-# 6. Manage Script
-def manage_script():
-    print(colored("Manage Script (Functionality to be implemented)", "blue"))
-
-# 7. Remove Script
-def remove_script():
-    print(colored("Removing Script (Functionality to be implemented)", "blue"))
-
-# 8. Update Script
-def update_script():
-    print(colored("Updating Script (Functionality to be implemented)", "blue"))
+    # Collect channels from the .env file
+    for line in lines:
+        if line.startswith("CHANNEL_") and "_ID" in line:
+            key = line.split('=')[0]
+            channel_id = line.split('=')[1].strip()
+            channels[key] = channel_id
     
-# 9. Main Execution Block
+    # Display available channels
+    print(Fore.GREEN + "Available Channels:")
+    for idx, (key, channel_id) in enumerate(channels.items(), start=1):
+        print(Fore.WHITE + f"{idx}." + Fore.GREEN + f" {channel_id}")
+    
+    choice = int(input(Fore.WHITE + "Select a channel by number: "))
+    selected_key = list(channels.keys())[choice - 1]
+    
+    # Edit channels based on the selected action
+    with open('.env', 'w') as env_file:
+        for line in lines:
+            if action == "remove" and selected_key in line:
+                continue
+            elif action == "stop" and selected_key in line and "_LINK" not in line:
+                env_file.write(f"{selected_key}={channels[selected_key]}_STOP\n")
+            elif action == "resume" and selected_key in line and "_STOP" in line:
+                env_file.write(line.replace("_STOP", ""))
+            else:
+                env_file.write(line)
+    
+    print(Fore.GREEN + f"Channel {action} operation completed.")
+    manage_channels()
+
+# Post timing management
+def manage_post_timing():
+    interval = input(Fore.WHITE + "Enter post interval in minutes (default is 30): ") or "30"
+    start_time = input(Fore.WHITE + "Enter start time (HH:mm, default is 08:00): ") or "08:00"
+    end_time = input(Fore.WHITE + "Enter end time (HH:mm, default is 24:00): ") or "24:00"
+    
+    # Create service file
+    service_content = f"""[Unit]
+Description=Run Xtream UI Bot Script
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/xtream-ui_bot/core
+ExecStart=/usr/bin/python3 massage.py
+Environment="PATH=/usr/bin:/usr/local/bin"
+Restart=on-failure
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
+"""
+    with open("/etc/systemd/system/xtream-ui_bot.service", 'w') as service_file:
+        service_file.write(service_content)
+    
+    # Create timer file
+    timer_content = f"""[Unit]
+Description=Run Xtream UI Bot Script every {interval} minutes between {start_time} and {end_time}
+
+[Timer]
+Unit=xtream-ui_bot.service
+OnBootSec=5min
+OnUnitActiveSec={interval}min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+"""
+    with open("/etc/systemd/system/xtream-ui_bot.timer", 'w') as timer_file:
+        timer_file.write(timer_content)
+    
+    # Reload and enable systemd services
+    os.system("systemctl daemon-reload")
+    os.system("systemctl enable xtream-ui_bot.timer")
+    os.system("systemctl start xtream-ui_bot.timer")
+    
+    print(Fore.GREEN + "Post timing management configured successfully.")
+    manage_bot()
+    
+    main()
+
+# Update script
+def update_bot():
+    """
+    Update the bot by pulling the latest files from GitHub while preserving the .env file.
+    """
+    print(Fore.CYAN + "Updating xtream-ui bot...")
+    
+    # Check if the project directory is in /opt
+    project_path = "/opt/xtream-ui_bot"
+    if not os.path.exists(project_path):
+        print(Fore.RED + f"Error: Project not found in {project_path}. Please install the bot first.")
+        return
+
+    try:
+        # Navigate to the project directory
+        os.chdir(project_path)
+
+        # Backup the .env file
+        env_path = os.path.join(project_path, ".env")
+        if os.path.exists(env_path):
+            print(Fore.YELLOW + "Backing up the .env file...")
+            shutil.copy(env_path, "/tmp/.env_backup")
+        else:
+            print(Fore.YELLOW + "No .env file found to back up.")
+
+        # Remove all files except the .env file
+        print(Fore.YELLOW + "Cleaning up old files...")
+        for item in os.listdir(project_path):
+            item_path = os.path.join(project_path, item)
+            if os.path.isdir(item_path):
+                shutil.rmtree(item_path)
+            elif os.path.isfile(item_path) and item != ".env":
+                os.remove(item_path)
+
+        # Clone the latest project files from GitHub
+        print(Fore.YELLOW + "Downloading the latest files from GitHub...")
+        subprocess.run(["git", "clone", "git@github.com:masoudgb/Xtream-ui_bot.git", "."], check=True)
+
+        # Restore the .env file
+        if os.path.exists("/tmp/.env_backup"):
+            print(Fore.YELLOW + "Restoring the .env file...")
+            shutil.move("/tmp/.env_backup", env_path)
+
+        print(Fore.GREEN + "Update completed successfully.")
+    except subprocess.CalledProcessError as e:
+        print(Fore.RED + f"Error during update: {str(e)}")
+    except Exception as e:
+        print(Fore.RED + f"An unexpected error occurred: {str(e)}")
+
+    main()
+
+# حذف ربات
+def uninstall_bot():
+    print(Fore.GREEN + "Uninstalling xtream-ui bot...")
+    # اینجا می‌توانید کد حذف را اضافه کنید
+    main()
+
+# خروج از برنامه
+def exit_program():
+    print(Fore.GREEN + "Exiting...")
+    exit()
+
+# اجرای برنامه
 if __name__ == "__main__":
-    """
-    Main execution block.
-    """
-    display_main_menu()
+    main()
