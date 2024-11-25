@@ -32,7 +32,7 @@ API_URL = os.getenv("API_URL")
 USERNAME = os.getenv("USERNAME")
 PASSWORD = os.getenv("PASSWORD")
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-DEFAULT_FILM_COVER = os.getenv("DEFAULT_FILM_COVER")
+DEFAULT_VOD_COVER_URL = os.getenv("DEFAULT_VOD_COVER_URL")
 DEFAULT_SERIES_COVER = os.getenv("DEFAULT_SERIES_COVER")
 
 # Parse channels
@@ -53,7 +53,7 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 # Sends VOD data to all channels
 def send_to_all_channels_for_vod():
     try:
-        check_and_notify_new_vod(API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHANNELS, DEFAULT_FILM_COVER)
+        check_and_notify_new_vod(API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHANNELS, DEFAULT_VOD_COVER_URL)
         print(colored("VOD notifications sent successfully.", "cyan"))
     except Exception as e:
         print(colored(f"Error sending VOD notifications: {str(e)}", "red"))
@@ -61,7 +61,7 @@ def send_to_all_channels_for_vod():
 # Sends Series data to all channels
 def send_to_all_channels_for_series():
     try:
-        check_and_notify_new_series(API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHANNELS, DEFAULT_SERIES_COVER)
+        check_and_notify_new_series(API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHANNELS, DEFAULT_SERIES_COVER_URL)
         print(colored("Series notifications sent successfully.", "cyan"))
     except Exception as e:
         print(colored(f"Error sending Series notifications: {str(e)}", "red"))
@@ -75,8 +75,8 @@ def install_script():
     username = input(colored("Enter the API username: ", "green"))
     password = input(colored("Enter the API password: ", "green"))
     telegram_token = input(colored("Enter the Telegram bot token: ", "green"))
-    default_film_cover = input(colored("Enter the default film cover URL: ", "green"))
-    default_series_cover = input(colored("Enter the default series cover URL: ", "green"))
+    default_vod_cover_url = input(colored("Enter the default film cover URL: ", "green"))
+    default_series_cover_url = input(colored("Enter the default series cover URL: ", "green"))
 
     # Gather channels
     channels = []
@@ -93,8 +93,8 @@ def install_script():
         env_file.write(f"USERNAME={username}\n")
         env_file.write(f"PASSWORD={password}\n")
         env_file.write(f"TELEGRAM_TOKEN={telegram_token}\n")
-        env_file.write(f"DEFAULT_FILM_COVER={default_film_cover}\n")
-        env_file.write(f"DEFAULT_SERIES_COVER={default_series_cover}\n")
+        env_file.write(f"DEFAULT_VOD_COVER_URL={default_vod_cover_url}\n")
+        env_file.write(f"DEFAULT_SERIES_COVER_URL={default_series_cover_url}\n")
         for index, channel in enumerate(channels, start=1):
             env_file.write(f"CHANNEL_{index}_ID={channel['id']}\n")
             env_file.write(f"CHANNEL_{index}_LINK={channel['link']}\n")
