@@ -1,5 +1,5 @@
 import os
-from shutil import rmtree
+import shutil 
 import subprocess
 from colorama import Fore, init
 
@@ -370,23 +370,21 @@ def update_bot():
         # Change to the installation directory
         os.chdir(install_path)
 
+        # Check if the directory is a git repository
+        if not os.path.exists(".git"):
+            print(Fore.YELLOW + "This is not a Git repository. Re-initializing the repository...")
+            subprocess.run(['git', 'init'], check=True)
+            subprocess.run(['git', 'remote', 'add', 'origin', 'https://github.com/masoudgb/Xtream-ui_bot.git'], check=True)
+            subprocess.run(['git', 'fetch'], check=True)
+        
         # Back up the .env file
         if os.path.exists('.env'):
             print(Fore.YELLOW + "Backing up the .env file...")
             os.rename('.env', '.env_backup')
 
-        # Clean up old files (except .env_backup)
-        print(Fore.YELLOW + "Cleaning up old files...")
-        for item in os.listdir('.'):
-            if item not in ['.env_backup']:
-                if os.path.isdir(item):
-                    rmtree(item)  # Correctly using rmtree to delete directories
-                else:
-                    os.remove(item)
-
-        # Use git pull instead of git clone to update the files
+        # Pull the latest changes from GitHub
         print(Fore.YELLOW + "Pulling the latest files from GitHub...")
-        subprocess.run(['git', 'pull'], check=True)
+        subprocess.run(['git', 'pull', 'origin', 'main', '--force'], check=True)
 
         # Restore the .env file
         if os.path.exists('.env_backup'):
