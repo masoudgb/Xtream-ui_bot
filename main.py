@@ -168,38 +168,7 @@ def main():
     print(Style.RESET_ALL)
 
     main()
-    
-    # Get user input
-    choice = input(Fore.WHITE + "Please choose an option: ")
-    
-    if choice == "1":
-        install_bot()
-    elif choice == "2":
-        manage_bot()
-    elif choice == "3":
-        update_bot()
-    elif choice == "4":
-        uninstall_bot()
-    elif choice == "5":
-        exit_program()
-    else:
-        print(Fore.RED + "Invalid option, please try again.")
-        main()
 
-# Main menu
-def main():
-    """
-    Main menu for the bot setup and management.
-    """
-    print(Fore.CYAN + "xtream-ui bot powered by masoud_gb")
-    
-    # Display options with green text and white numbers
-    print(Fore.WHITE + "1." + Fore.GREEN + " Install xtream-ui bot")
-    print(Fore.WHITE + "2." + Fore.GREEN + " Manage xtream-ui bot")
-    print(Fore.WHITE + "3." + Fore.GREEN + " Update xtream-ui bot")
-    print(Fore.WHITE + "4." + Fore.GREEN + " Uninstall")
-    print(Fore.WHITE + "5." + Fore.GREEN + " Exit")
-    
     # Get user input
     choice = input(Fore.WHITE + "Please choose an option: ")
     
