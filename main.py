@@ -402,7 +402,7 @@ def update_bot():
 # Unistall
 def uninstall_bot():
     # Confirm uninstallation
-    confirmation = input(Fore.RED + "Are you sure you want to uninstall xtream-ui bot? (y/n): ").strip().lower()
+    confirmation = input(Fore.YELLOW + "Are you sure you want to uninstall xtream-ui bot? (y/n): ").strip().lower()
     if confirmation != "y":
         print(Fore.YELLOW + "Uninstallation cancelled.")
         main()
