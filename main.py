@@ -129,24 +129,22 @@ def install_bot():
     # Return to the main menu after installation
     main() 
 
-from colorama import Fore
 
-def shadow_box():
-    text = f"{Fore.LIGHTCYAN_EX}xtream-ui bot powered by masoud_gb{Fore.RESET}"
-    box_width = len("xtream-ui bot powered by masoud_gb") + 4
+def animated_text(text, delay=0.05):
+    for char in text:
+        sys.stdout.write(Fore.LIGHTCYAN_EX + char)
+        sys.stdout.flush()
+        time.sleep(delay)
+    print(Style.RESET_ALL)
 
-    print(Fore.WHITE + f"  {'▄' * box_width}")
-    print(f"  ▌{text}{' ' * (box_width - len(text) - 1)}▐")
-    print(f"  ▀{'▄' * (box_width - 1)}▀")
-    shadow_box()
-    print("\n" * 1)
-
+animated_text("xtream-ui bot powered by masoud_gb")
+    
 # Main menu
 def main():
     """
     Main menu for the bot setup and management.
     """
-    
+    print("\n" * 1)
     # Display options with green text and white numbers
     print(Fore.WHITE + "1." + Fore.GREEN + " Install xtream-ui bot")
     print(Fore.WHITE + "2." + Fore.GREEN + " Manage xtream-ui bot")
