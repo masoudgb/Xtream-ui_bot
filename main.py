@@ -130,24 +130,11 @@ def install_bot():
     main()
 
 def print_stylish_box():
-    """
-    Prints a stylish box with text centered inside.
-    """
-    # Separate text parts
-    part1 = "xtream-ui bot powered"
-    part2 = "by"
-    part3 = "masoud_gb"
+    # Define the full text
+    text = f"{Fore.LIGHTCYAN_EX}xtream-ui bot powered by masoud_gb"
 
-    # Combine the parts with respective colors
-    text = (
-        Fore.LIGHTCYAN_EX + part1 + " " +
-        Fore.LIGHTCYAN_EX + part2 + " " +  # Change "by" color to light cyan
-        Fore.LIGHTCYAN_EX + part3
-    )
-    
     # Calculate the box width based on the length of the text
-    text_length = len(text)
-    box_width = text_length + 4  # Add padding for the vertical bars
+    box_width = len(text) + 4  # Add padding for the vertical bars
 
     # Box characters
     top_left = "╔"
@@ -160,15 +147,9 @@ def print_stylish_box():
     # Print the top border
     print(Fore.WHITE + top_left + (horizontal * box_width) + top_right)
 
-    # Print empty lines for padding above text (1 line of padding)
+    # Print the line with the text centered
     print(Fore.WHITE + vertical + " " * (box_width - 2) + vertical)
-
-    # Print the text line, centered (since the box width is now based on text length)
-    centered_text = text.center(box_width - 2)  # Center the text with padding for vertical bars
-    print(Fore.WHITE + vertical + centered_text + vertical)
-
-    # Print empty lines for padding below text (1 line of padding)
-    print(Fore.WHITE + vertical + " " * (box_width - 2) + vertical)
+    print(Fore.WHITE + vertical + text.center(box_width - 2) + vertical)
 
     # Print the bottom border
     print(Fore.WHITE + bottom_left + (horizontal * box_width) + bottom_right)
