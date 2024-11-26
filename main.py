@@ -129,21 +129,26 @@ def install_bot():
     # Return to the main menu after installation
     main() 
 
-import pyfiglet
+from colorama import Fore, Style
+import sys
+import time
 
-def print_ascii_banner():
-    text = "xtream-ui bot powered by masoud_gb"
-    ascii_art = pyfiglet.figlet_format(text, font="slant")  # یا انتخاب فونت‌های مختلف
-    print(Fore.LIGHTCYAN_EX + ascii_art + Fore.RESET)
+def gradient_text(text):
+    colors = [Fore.LIGHTCYAN_EX, Fore.LIGHTBLUE_EX, Fore.LIGHTGREEN_EX]
+    for i, char in enumerate(text):
+        sys.stdout.write(colors[i % len(colors)] + char)
+        sys.stdout.flush()
+        time.sleep(0.03)
+    print(Style.RESET_ALL)
 
-print_ascii_banner()
+gradient_text("xtream-ui bot powered by masoud_gb")
 
 # Main menu
 def main():
     """
     Main menu for the bot setup and management.
     """
-    print_ascii_banner()
+    #print_ascii_banner()
     print("\n" * 1)
     
     # Display options with green text and white numbers
