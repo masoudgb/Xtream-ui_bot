@@ -108,7 +108,7 @@ def install_bot():
     env_path = os.path.join(os.getcwd(), '.env')
     with open(env_path, 'w') as env_file:
         env_file.write(f"# API Information\n")
-        env_file.write(f"API_URL={api_url}\n")
+        env_file.write(f"API_URL={api_url}/player_api.php\n")
         env_file.write(f"USERNAME={username}\n")
         env_file.write(f"PASSWORD={password}\n\n")
         
