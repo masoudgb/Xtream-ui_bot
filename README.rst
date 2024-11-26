@@ -67,7 +67,7 @@ During installation, the bot will ask for:
 
 - Xtream-UI API URL (e.g., http://yourserver:8080)
 - API Username and Password
-- **Telegram Bot Token**: You can create a bot and get your token by chatting with [**BotFather**](https://t.me/BotFather) on Telegram.
+- **Telegram Bot Token**: You can create a bot and get your token by chatting with `BotFather <https://t.me/BotFather>`_ on Telegram.
 - Channel IDs: Include both private/public channels.
 
 ### Post Timing
@@ -126,3 +126,4 @@ Contact
 For questions or support, you can reach out via:
 
 - **GitHub**: MasoudGB  (https://github.com/masoudgb)
+- **Telegram**: [Your Telegram Handle]
