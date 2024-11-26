@@ -131,12 +131,13 @@ def install_bot():
     # Return to the main menu after installation
     main() 
 
+
 def animated_text_with_border(text, delay=0.05):
     # طول متن برای محاسبه طول خط بالا و پایین
     text_length = len(text)
     
     # خطوط بالایی و پایینی
-    border_line = "═" * (text_length + 4)
+    border_line = "═" * (text_length + 2)  # یک واحد کمتر برای فضای اطراف
     
     # چاپ خط بالایی
     print(Fore.WHITE + "╔" + border_line + "╗")
@@ -160,7 +161,7 @@ def animated_text_with_border(text, delay=0.05):
     print(Style.RESET_ALL)
 
 animated_text_with_border("xtream-ui bot powered by masoud_gb")
-    
+
 # Main menu
 def main():
     """
