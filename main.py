@@ -1,7 +1,7 @@
 import os
 import shutil
 import subprocess
-from colorama import Fore, Style
+from colorama import Fore, Style, init
 
 init(autoreset=True)
 
