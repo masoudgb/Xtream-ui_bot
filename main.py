@@ -131,15 +131,17 @@ def install_bot():
 
 def print_stylish_box():
     text = f"{Fore.LIGHTCYAN_EX}xtream-ui bot powered by masoud_gb{Fore.RESET}"
-    text_length = len("xtream-ui bot powered by masoud_gb")
-    box_width = text_length + 4
+    plain_text = "xtream-ui bot powered by masoud_gb"  # متن بدون کدهای رنگ
+    text_length = len(plain_text)
+    box_width = text_length + 4  # فضای خالی از دو طرف متن
+
     top_border = f"╔{'═' * box_width}╗"
     bottom_border = f"╚{'═' * box_width}╝"
     padding_line = f"║{' ' * box_width}║"
 
     print(Fore.WHITE + top_border)
     print(padding_line)
-    print(f"║  {text}{Fore.WHITE}  ║")
+    print(f"║  {text}{' ' * (box_width - text_length - 2)}║")  # متن با فاصله مناسب از ستون راست
     print(padding_line)
     print(bottom_border)
 
