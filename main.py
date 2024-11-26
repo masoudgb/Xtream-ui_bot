@@ -134,8 +134,6 @@ def main():
     """
     Main menu for the bot setup and management.
     """
-from colorama import Fore, Style
-
 def print_stylish_box():
     """
     Prints a stylish box with text centered inside.
