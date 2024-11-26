@@ -1,5 +1,5 @@
 import os
-import shutil 
+import shutil
 import subprocess
 from colorama import Fore, init
 
@@ -373,9 +373,9 @@ def update_bot():
         # Check if the directory is a git repository
         if not os.path.exists(".git"):
             print(Fore.YELLOW + "This is not a Git repository. Re-initializing the repository...")
-            subprocess.run(['git', 'init'], check=True)
-            subprocess.run(['git', 'remote', 'add', 'origin', 'https://github.com/masoudgb/Xtream-ui_bot.git'], check=True)
-            subprocess.run(['git', 'fetch'], check=True)
+            subprocess.run(['git', 'init'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run(['git', 'remote', 'add', 'origin', 'https://github.com/masoudgb/Xtream-ui_bot.git'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run(['git', 'fetch'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
         # Back up the .env file
         if os.path.exists('.env'):
@@ -384,7 +384,7 @@ def update_bot():
 
         # Pull the latest changes from GitHub
         print(Fore.YELLOW + "Pulling the latest files from GitHub...")
-        subprocess.run(['git', 'pull', 'origin', 'main', '--force'], check=True)
+        subprocess.run(['git', 'pull', 'origin', 'main', '--force'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         # Restore the .env file
         if os.path.exists('.env_backup'):
