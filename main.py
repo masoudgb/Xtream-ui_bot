@@ -148,14 +148,11 @@ def animated_text_with_border(text, delay=0.05):
     
     print(Style.RESET_ALL)
 
-#animated_text_with_border("xtream-ui bot powered by masoud_gb")
-
 # Main menu
 def main():
     """
     Main menu for the bot setup and management.
     """
-    #print("\n" * 1)
     animated_text_with_border("xtream-ui bot powered by masoud_gb")
     # Display options with green text and white numbers
     print(Fore.WHITE + "1." + Fore.GREEN + " Install xtream-ui bot")
