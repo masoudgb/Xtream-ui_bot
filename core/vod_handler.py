@@ -8,7 +8,7 @@ from config.config import DEFAULT_VOD_COVER_URL  # Importing default cover for V
 from config.config import CHANNELS  # Importing channels from config
 
 # Path to the JSON file for storing sent movie IDs
-MOVIES_FILE = "/opt/xtream-ui_bot/movies.json"
+MOVIES_FILE = "/opt/xtream-ui_bot/core/movies.json"
 
 # Temporary set to store sent movie IDs
 temp_sent_movie_ids = set()
@@ -18,7 +18,7 @@ def load_sent_movie_ids():
     if os.path.exists(MOVIES_FILE):
         with open(MOVIES_FILE, "r", encoding="utf-8") as file:
             return json.load(file)
-    return []
+    return []  # If file does not exist, return an empty list
 
 # Save sent movie IDs to the JSON file
 def save_sent_movie_ids(ids):
@@ -72,17 +72,17 @@ def notify_for_vod(vod_id, vod_name, vod_info, vod_cover, category_id, categorie
     vod_image = vod_cover if vod_cover else DEFAULT_VOD_COVER_URL
 
     # Send to Telegram
-    if send_to_telegram_with_retry(vod_image, caption, TELEGRAM_TOKEN, CHANNEL_ID):
-        temp_sent_movie_ids.add(vod_id)  # Add the ID to the temporary set
+    return send_to_telegram_with_retry(vod_image, caption, TELEGRAM_TOKEN, CHANNEL_ID)
 
 # Check and notify about new VODs
 def check_and_notify_new_vod(API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHANNELS):
     global temp_sent_movie_ids
 
+    # Check if it's the first run
     is_first_run = not os.path.exists(MOVIES_FILE)
 
     # Load previously sent movie IDs
-    sent_movie_ids = set(load_sent_movie_ids())
+    sent_movie_ids = set(load_sent_movie_ids())  # This will load an empty list if file doesn't exist
 
     # Fetch categories
     categories = get_vod_categories(API_URL, USERNAME, PASSWORD)
@@ -93,23 +93,38 @@ def check_and_notify_new_vod(API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHANNE
     # Fetch VOD data
     vod_data = get_vod_data(API_URL, USERNAME, PASSWORD)
     if vod_data:
-        for vod in vod_data:
-            vod_id = vod.get("stream_id")
-            if vod_id is None or vod_id in sent_movie_ids:
-                continue
+        if is_first_run:
+            # On the first run, save all VOD IDs directly
+            first_run_ids = {vod.get("stream_id") for vod in vod_data if vod.get("stream_id") is not None}
+            save_sent_movie_ids(list(first_run_ids))  # Save all IDs immediately
+            logging.info("First run: Saved all VOD IDs.")
+        else:
+            for vod in vod_data:
+                vod_id = vod.get("stream_id")
+                if vod_id is None or vod_id in sent_movie_ids:
+                    continue  # Skip already sent or invalid IDs
 
-            # Movie details
-            vod_name = vod.get("name", "Unknown Movie")
-            vod_cover = vod.get("stream_icon", None)
-            category_id = vod.get("category_id", 0)
-            vod_info = get_vod_info(API_URL, USERNAME, PASSWORD, vod_id)
+                # Movie details
+                vod_name = vod.get("name", "Unknown Movie")
+                vod_cover = vod.get("stream_icon", None)
+                category_id = vod.get("category_id", 0)
+                vod_info = get_vod_info(API_URL, USERNAME, PASSWORD, vod_id)
 
-            if vod_info:
-                # Send movie notification to all channels
-                for channel in CHANNELS:
-                    notify_for_vod(vod_id, vod_name, vod_info, vod_cover, category_id, categories, TELEGRAM_TOKEN, channel['id'], channel['link'])
+                if vod_info:
+                    # Flag to track successful notifications
+                    successfully_sent = True
 
-    # Save the updated list of sent IDs after notifying all channels
-    sent_movie_ids.update(temp_sent_movie_ids)
-    save_sent_movie_ids(list(sent_movie_ids))
-    temp_sent_movie_ids.clear()  # Clear the temporary set
+                    # Send movie notification to all channels
+                    for channel in CHANNELS:
+                        success = notify_for_vod(vod_id, vod_name, vod_info, vod_cover, category_id, categories, TELEGRAM_TOKEN, channel['id'], channel['link'])
+                        if not success:
+                            successfully_sent = False  # If one fails, mark as failed
+
+                    # If successfully sent to all channels, add to sent_movie_ids
+                    if successfully_sent:
+                        temp_sent_movie_ids.add(vod_id)
+
+            # Save the updated list of sent IDs after notifying all channels
+            sent_movie_ids.update(temp_sent_movie_ids)
+            save_sent_movie_ids(list(sent_movie_ids))  # Save updated list
+            temp_sent_movie_ids.clear()  # Clear the temporary set
