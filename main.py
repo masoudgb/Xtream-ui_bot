@@ -181,6 +181,7 @@ def print_stylish_box():
     # Print the bottom border
     print(Fore.WHITE + bottom_left + (horizontal * box_width) + bottom_right)
 
+# Main menu
 def main():
     """
     Main menu for the bot setup and management.
