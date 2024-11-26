@@ -140,9 +140,9 @@ def print_stylish_box():
     terminal_width = terminal_size.columns
     terminal_height = terminal_size.lines
     
-    # Set box dimensions
-    box_width = terminal_width - 4  # Leave some padding for aesthetics
-    box_height = 7  # Adjust height (can include more lines if needed)
+    # Set box dimensions (slightly smaller than the terminal)
+    box_width = terminal_width - 10  # Smaller width for better appearance
+    box_height = 5  # Reduced height for a compact look
 
     # Box characters
     top_left = "╔"
@@ -169,9 +169,6 @@ def print_stylish_box():
 
     # Print the bottom border
     print(Fore.WHITE + bottom_left + (horizontal * box_width) + bottom_right)
-
-# Call the function to test
-print_stylish_box()
 
 def main():
     """
