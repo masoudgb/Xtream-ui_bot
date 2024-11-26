@@ -131,15 +131,35 @@ def install_bot():
     # Return to the main menu after installation
     main() 
 
+def animated_text_with_border(text, delay=0.05):
+    # طول متن برای محاسبه طول خط بالا و پایین
+    text_length = len(text)
+    
+    # خطوط بالایی و پایینی
+    border_line = "═" * (text_length + 4)
+    
+    # چاپ خط بالایی
+    print(Fore.WHITE + "╔" + border_line + "╗")
+    
+    # چاپ فضای خالی قبل از متن
+    print(Fore.WHITE + "║", end=" ")
 
-def animated_text(text, delay=0.05):
+    # نمایش متن به صورت متحرک
     for char in text:
         sys.stdout.write(Fore.LIGHTCYAN_EX + char)
         sys.stdout.flush()
         time.sleep(delay)
+    
+    # چاپ فضای خالی بعد از متن
+    print(Fore.WHITE + " ║")
+    
+    # چاپ خط پایینی
+    print(Fore.WHITE + "╚" + border_line + "╝")
+    
+    # ریست کردن رنگ‌ها
     print(Style.RESET_ALL)
 
-animated_text("xtream-ui bot powered by masoud_gb")
+animated_text_with_border("xtream-ui bot powered by masoud_gb")
     
 # Main menu
 def main():
