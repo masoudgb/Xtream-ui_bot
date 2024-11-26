@@ -141,7 +141,7 @@ def print_stylish_box():
     # Combine the parts with respective colors
     text = (
         Fore.CYAN + part1 + " " +
-        Fore.WHITE + part2 + " " +
+        Fore.LIGHTCYAN_EX + part2 + " " +  # Change "by" color to light cyan
         Fore.CYAN + part3
     )
     
