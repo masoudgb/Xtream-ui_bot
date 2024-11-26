@@ -127,35 +127,27 @@ def install_bot():
     print(Fore.YELLOW + "To send a message, refer to the sending schedule section in Manage xtream-ui bot/Manage Post Timing")
     
     # Return to the main menu after installation
-    main()
+    main() 
 
 def print_stylish_box():
-    # Define the full text
+    # متن به همراه رنگ‌بندی
     text = f"{Fore.LIGHTCYAN_EX}xtream-ui bot powered by masoud_gb"
 
-    # Calculate the box width based on the length of the text
-    box_width = len(text) + 4  # Add padding for the vertical bars
+    # محاسبه طول متن و عرض کادر
+    text_length = len(Fore.RESET + text)  # طول متن شامل رنگ‌ها را حذف می‌کنیم
+    box_width = text_length + 4  # طول کادر با 2 فضای خالی از هر طرف
 
-    # Box characters
-    top_border = "╔" + "═" * (box_width - 2) + "╗"
-    bottom_border = "╚" + "═" * (box_width - 2) + "╝"
-    vertical_border = "║"
+    # ساخت کادر
+    top_border = f"╔{'═' * box_width}╗"
+    bottom_border = f"╚{'═' * box_width}╝"
+    padding_line = f"║{' ' * box_width}║"  # خطوط خالی
 
-    # Print the top border
+    # چاپ کادر
     print(Fore.WHITE + top_border)
-
-    # Print the empty line above the text for padding
-    print(Fore.WHITE + vertical_border + " " * (box_width - 2) + vertical_border)  # Padding above the text
-
-    # Center the text inside the box, making sure the length of spaces is correct
-    text_spaces = (box_width - 2 - len(text)) // 2  # Calculate space needed on the left side
-    print(Fore.WHITE + vertical_border + " " * text_spaces + text + " " * (box_width - 2 - len(text) - text_spaces) + vertical_border)
-
-    # Print the empty line below the text for padding
-    print(Fore.WHITE + vertical_border + " " * (box_width - 2) + vertical_border)  # Padding below the text
-
-    # Print the bottom border
-    print(Fore.WHITE + bottom_border)
+    print(padding_line)  # خط خالی بالای متن
+    print(f"║  {text}{Fore.WHITE}  ║")  # متن با فاصله از لبه‌ها
+    print(padding_line)  # خط خالی پایین متن
+    print(bottom_border)
 
 # Main menu
 def main():
