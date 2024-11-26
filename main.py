@@ -186,7 +186,7 @@ def main():
     Main menu for the bot setup and management.
     """
     print_stylish_box()
-    print("\n" * 2)
+    print("\n" * 1)
     
     # Display options with green text and white numbers
     print(Fore.WHITE + "1." + Fore.GREEN + " Install xtream-ui bot")
