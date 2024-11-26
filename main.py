@@ -140,19 +140,19 @@ def print_stylish_box():
 
     # Combine the parts with respective colors
     text = (
-        Fore.GREEN + part1 + " " +
+        Fore.YELLOW + part1 + " " +
         Fore.WHITE + part2 + " " +
-        Fore.GREEN + part3
+        Fore.YELLOW + part3
     )
     
     # Get terminal dimensions
     terminal_size = shutil.get_terminal_size((80, 20))  # Default to 80x20 if size can't be determined
     terminal_width = terminal_size.columns
     terminal_height = terminal_size.lines
-    
+
     # Set box dimensions
-    box_width = terminal_width - 10  # Smaller width for better appearance
-    box_height = 5  # Reduced height for a compact look
+    box_width = min(terminal_width - 10, 80)  # Limit max width to 80 for better appearance
+    box_height = 5  # Compact height
 
     # Box characters
     top_left = "╔"
@@ -171,7 +171,8 @@ def print_stylish_box():
         print(Fore.WHITE + vertical + " " * box_width + vertical)
 
     # Print the text line, centered
-    print(Fore.WHITE + vertical + " " + text.center(box_width - 2) + " " + vertical)
+    centered_text = text.center(box_width)
+    print(Fore.WHITE + vertical + centered_text + vertical)
 
     # Print empty lines for padding below text
     for _ in range(padding_lines):
