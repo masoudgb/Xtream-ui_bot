@@ -148,8 +148,9 @@ def print_stylish_box():
     print(Fore.WHITE + top_left + (horizontal * box_width) + top_right)
 
     # Print the line with the text centered
-    print(Fore.WHITE + vertical + " " * (box_width - 2) + vertical)
-    print(Fore.WHITE + vertical + text.center(box_width - 2) + vertical)
+    print(Fore.WHITE + vertical + " " * (box_width - 2) + vertical)  # Empty line for padding above
+    print(Fore.WHITE + vertical + text.center(box_width - 2) + vertical)  # Centered text
+    print(Fore.WHITE + vertical + " " * (box_width - 2) + vertical)  # Empty line for padding below
 
     # Print the bottom border
     print(Fore.WHITE + bottom_left + (horizontal * box_width) + bottom_right)
