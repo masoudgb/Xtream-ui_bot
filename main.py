@@ -133,14 +133,24 @@ def print_stylish_box():
     """
     Prints a stylish box with text centered inside.
     """
-    text = "xtream-ui bot powered by masoud_gb"
+    # Separate text parts
+    part1 = "xtream-ui bot powered"
+    part2 = "by"
+    part3 = "masoud_gb"
+
+    # Combine the parts with respective colors
+    text = (
+        Fore.GREEN + part1 + " " +
+        Fore.WHITE + part2 + " " +
+        Fore.GREEN + part3
+    )
     
     # Get terminal dimensions
     terminal_size = shutil.get_terminal_size((80, 20))  # Default to 80x20 if size can't be determined
     terminal_width = terminal_size.columns
     terminal_height = terminal_size.lines
     
-    # Set box dimensions (slightly smaller than the terminal)
+    # Set box dimensions
     box_width = terminal_width - 10  # Smaller width for better appearance
     box_height = 5  # Reduced height for a compact look
 
@@ -161,7 +171,7 @@ def print_stylish_box():
         print(Fore.WHITE + vertical + " " * box_width + vertical)
 
     # Print the text line, centered
-    print(Fore.WHITE + vertical + " " + Fore.LIGHTCYAN_EX + text.center(box_width - 2) + Fore.WHITE + " " + vertical)
+    print(Fore.WHITE + vertical + " " + text.center(box_width - 2) + " " + vertical)
 
     # Print empty lines for padding below text
     for _ in range(padding_lines):
