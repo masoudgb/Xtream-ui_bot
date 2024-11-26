@@ -172,7 +172,7 @@ def print_stylish_box():
 
     # Print the text line, centered
     # Adjusting the text to be centered based on box_width
-    centered_text = text.center(box_width)
+    centered_text = text.center(box_width - 2)  # Add padding for vertical bars
     print(Fore.WHITE + vertical + centered_text + vertical)
 
     # Print empty lines for padding below text
