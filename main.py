@@ -1,5 +1,5 @@
 import os
-import shutil
+import shutil import rmtree
 import subprocess
 from colorama import Fore, init
 
@@ -400,7 +400,6 @@ def update_bot():
     main()
 
 # Unistall
-
 def uninstall_bot():
     # Confirm uninstallation
     confirmation = input(Fore.RED + "Are you sure you want to uninstall xtream-ui bot? (y/n): ").strip().lower()
@@ -435,15 +434,15 @@ def uninstall_bot():
         subprocess.run(['systemctl', 'daemon-reload'], check=False)
 
         # Remove the bot directory
-        print(Fore.YELLOW + "Removing bot files from /opt/xtream-ui_bot...")
         bot_directory = "/opt/xtream-ui_bot"
+        print(Fore.YELLOW + f"Removing bot files from {bot_directory}...")
         if os.path.exists(bot_directory):
             shutil.rmtree(bot_directory)
 
-        # Remove the .env file and its backup if they exist
+        # Remove the .env file and its backup if they exist in /opt/xtream-ui_bot
+        env_file = os.path.join(bot_directory, ".env")
+        env_backup_file = os.path.join(bot_directory, ".env_backup")
         print(Fore.YELLOW + "Removing .env file and backups...")
-        env_file = os.path.join(os.getcwd(), ".env")
-        env_backup_file = os.path.join(os.getcwd(), ".env.bak")
         if os.path.exists(env_file):
             os.remove(env_file)
         if os.path.exists(env_backup_file):
