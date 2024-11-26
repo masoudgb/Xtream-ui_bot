@@ -245,9 +245,10 @@ def manage_channels():
     print(Fore.WHITE + "2." + Fore.GREEN + " Stop Sending to Channel")
     print(Fore.WHITE + "3." + Fore.GREEN + " Resume Sending to Channel")
     print(Fore.WHITE + "4." + Fore.GREEN + " Remove Channel")
-    
+    print(Fore.WHITE + "5." + Fore.GREEN + " Back")
+
     choice = input(Fore.WHITE + "Please Choose an option: ")
-    
+
     if choice == "1":
         add_channel()
     elif choice == "2":
@@ -256,6 +257,9 @@ def manage_channels():
         resume_channel()
     elif choice == "4":
         remove_channel()
+    elif choice == "5":
+        print(Fore.WHITE + "Returning to the previous menu.")
+        manage_bot() 
     else:
         print(Fore.RED + "Invalid option, returning to manage menu.")
         manage_bot()
