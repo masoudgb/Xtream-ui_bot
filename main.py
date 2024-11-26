@@ -145,14 +145,9 @@ def print_stylish_box():
         Fore.LIGHTCYAN_EX + part3
     )
     
-    # Get terminal dimensions
-    terminal_size = shutil.get_terminal_size((80, 20))  # Default to 80x20 if size can't be determined
-    terminal_width = terminal_size.columns
-    terminal_height = terminal_size.lines
-
-    # Set box dimensions
-    box_width = min(terminal_width - 10, 80)  # Limit max width to 80 for better appearance
-    box_height = 5  # Compact height
+    # Calculate the box width based on the length of the text
+    text_length = len(text)
+    box_width = text_length + 4  # Add padding for the vertical bars
 
     # Box characters
     top_left = "╔"
@@ -165,23 +160,15 @@ def print_stylish_box():
     # Print the top border
     print(Fore.WHITE + top_left + (horizontal * box_width) + top_right)
 
-    # Print empty lines for padding above text
-    padding_lines = (box_height - 3) // 2
-    for _ in range(padding_lines):
-        print(Fore.WHITE + vertical + " " * (box_width) + vertical)
+    # Print empty lines for padding above text (1 line of padding)
+    print(Fore.WHITE + vertical + " " * (box_width - 2) + vertical)
 
-    # Calculate spaces for centering the text
-    text_length = len(text)
-    spaces_before = (box_width - text_length - 2) // 2  # Calculate spaces before the text to center it
-    spaces_after = box_width - text_length - spaces_before - 2  # Calculate spaces after the text
-
-    # Print the text line, centered
-    centered_text = " " * spaces_before + text + " " * spaces_after
+    # Print the text line, centered (since the box width is now based on text length)
+    centered_text = text.center(box_width - 2)  # Center the text with padding for vertical bars
     print(Fore.WHITE + vertical + centered_text + vertical)
 
-    # Print empty lines for padding below text
-    for _ in range(padding_lines):
-        print(Fore.WHITE + vertical + " " * (box_width) + vertical)
+    # Print empty lines for padding below text (1 line of padding)
+    print(Fore.WHITE + vertical + " " * (box_width - 2) + vertical)
 
     # Print the bottom border
     print(Fore.WHITE + bottom_left + (horizontal * box_width) + bottom_right)
