@@ -129,28 +129,21 @@ def install_bot():
     # Return to the main menu after installation
     main() 
 
-def print_stylish_box():
-    text = f"{Fore.LIGHTCYAN_EX}xtream-ui bot powered by masoud_gb{Fore.RESET}"
-    plain_text = "xtream-ui bot powered by masoud_gb"  # متن بدون کدهای رنگ
-    text_length = len(plain_text)
-    box_width = text_length + 4  # فضای خالی از دو طرف متن
+import pyfiglet
 
-    top_border = f"╔{'═' * box_width}╗"
-    bottom_border = f"╚{'═' * box_width}╝"
-    padding_line = f"║{' ' * box_width}║"
+def print_ascii_banner():
+    text = "xtream-ui bot powered by masoud_gb"
+    ascii_art = pyfiglet.figlet_format(text, font="slant")  # یا انتخاب فونت‌های مختلف
+    print(Fore.LIGHTCYAN_EX + ascii_art + Fore.RESET)
 
-    print(Fore.WHITE + top_border)
-    print(padding_line)
-    print(f"║  {text}{' ' * (box_width - text_length - 2)}║")  # متن با فاصله مناسب از ستون راست
-    print(padding_line)
-    print(bottom_border)
+print_ascii_banner()
 
 # Main menu
 def main():
     """
     Main menu for the bot setup and management.
     """
-    print_stylish_box()
+    print_ascii_banner()
     print("\n" * 1)
     
     # Display options with green text and white numbers
