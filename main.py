@@ -140,9 +140,9 @@ def print_stylish_box():
 
     # Combine the parts with respective colors
     text = (
-        Fore.CYAN + part1 + " " +
+        Fore.LIGHTCYAN_EX + part1 + " " +
         Fore.LIGHTCYAN_EX + part2 + " " +  # Change "by" color to light cyan
-        Fore.CYAN + part3
+        Fore.LIGHTCYAN_EX + part3
     )
     
     # Get terminal dimensions
@@ -170,9 +170,13 @@ def print_stylish_box():
     for _ in range(padding_lines):
         print(Fore.WHITE + vertical + " " * (box_width) + vertical)
 
+    # Calculate spaces for centering the text
+    text_length = len(text)
+    spaces_before = (box_width - text_length - 2) // 2  # Calculate spaces before the text to center it
+    spaces_after = box_width - text_length - spaces_before - 2  # Calculate spaces after the text
+
     # Print the text line, centered
-    # Adjusting the text to be centered based on box_width
-    centered_text = text.center(box_width - 2)  # Add padding for vertical bars
+    centered_text = " " * spaces_before + text + " " * spaces_after
     print(Fore.WHITE + vertical + centered_text + vertical)
 
     # Print empty lines for padding below text
