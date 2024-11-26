@@ -1,26 +1,31 @@
-
 ---
 
 Xtream-UI Bot
 
 A powerful bot using the Xtream-UI API to automatically post movie and series posters along with information from your Xtream-UI server directly to Telegram channels.
 
+
+---
+
 Features
 
-Posts movies and series added to your Xtream-UI server automatically.
+Automatically posts movies and series added to your Xtream-UI server.
 
-Fully customizable settings, including Telegram channels and posting intervals.
+Fully customizable, including Telegram channels and posting intervals.
 
 Supports multiple channels with unique configurations.
 
-Share your content with rich visual details effortlessly.
+Effortlessly share your content with rich visual details.
 
+
+
+---
 
 Requirements
 
 Root Access: Required for installing and configuring the bot.
 
-Operating System: Ubuntu 20.04 or newer recommended.
+Operating System: Ubuntu 20.04 or newer is recommended.
 
 Python: Python 3.x with pip installed.
 
@@ -29,8 +34,6 @@ Python: Python 3.x with pip installed.
 ---
 
 Installation
-
-Follow the steps below to install the bot:
 
 1. Clone the repository:
 
@@ -49,32 +52,30 @@ python3 main.py
 
 Running the Bot
 
-After installation, start the bot using:
+To start the bot:
 
 python3 /opt/xtream-ui_bot/main.py
 
-You can manage the bot and its settings through the interactive menu.
+Manage the bot through its interactive menu.
 
 
 ---
 
 Menu Options
 
-The bot includes the following options:
-
-1. Install Xtream-UI Bot: For new installations.
+1. Install Xtream-UI Bot: Set up the bot for the first time.
 
 
-2. Manage Xtream-UI Bot: Edit channels, post intervals, and more.
+2. Manage Xtream-UI Bot: Edit settings, channels, and post intervals.
 
 
-3. Update Xtream-UI Bot: Update the bot to the latest version.
+3. Update Xtream-UI Bot: Update to the latest version.
 
 
-4. Uninstall Xtream-UI Bot: Completely remove the bot and all configurations.
+4. Uninstall Xtream-UI Bot: Completely remove the bot.
 
 
-5. Exit: Exit the script.
+5. Exit: Exit the menu.
 
 
 
@@ -85,42 +86,44 @@ Configuration Details
 
 Telegram Settings
 
-During installation, the bot will ask for:
+During installation, provide:
 
-Xtream-UI API URL (e.g., http://yourserver:8080)
+Xtream-UI API URL: e.g., http://yourserver:8080
 
 API Username and Password
 
-Telegram Bot Token (create your bot using BotFather)
+Telegram Bot Token: Create your bot via BotFather
 
-Channel IDs: Include both private/public channels.
+Channel IDs: Add private or public channels.
 
 
 Post Timing
 
-Control posting schedules using the Manage Post Timing option. You can set specific intervals or times for content sharing.
+Set specific intervals or times for posting content via the Manage Post Timing option.
 
 Default Cover Images
 
-The bot supports setting default covers for movies and series that do not include custom posters.
+Configure default covers for movies and series missing custom posters.
 
 
 ---
 
 Updating the Bot
 
-To update the bot, select the Update Xtream-UI Bot option in the menu. This will pull the latest code while preserving your settings.
+To update, choose the Update Xtream-UI Bot option in the menu. This pulls the latest code while keeping your settings intact.
 
 
 ---
 
 Uninstallation
 
-To completely remove the bot:
+To remove the bot:
 
-Select the Uninstall Xtream-UI Bot option from the menu.
+1. Select the Uninstall Xtream-UI Bot option.
 
-It will clean up all services and files.
+
+2. All services and files will be deleted.
+
 
 
 
@@ -128,7 +131,7 @@ It will clean up all services and files.
 
 System Requirements
 
-The bot automatically installs required Python libraries, including:
+Required Python libraries are installed automatically, including:
 
 python-telegram-bot
 
@@ -144,35 +147,33 @@ requests
 
 Automation (Systemd Service)
 
-The bot uses a systemd service and timer for automatic execution:
+The bot uses a systemd service and timer for automation:
 
 Service: Runs the bot.
 
-Timer: Defines posting intervals (default: 30 minutes).
+Timer: Configures posting intervals (default: 30 minutes).
 
 
-These are configured and activated during installation.
+These are activated during installation.
 
 
 ---
 
 Contributing
 
-Contributions are welcome! Feel free to open an issue or submit a pull request.
+Contributions are welcome! Open an issue or submit a pull request.
 
 
 ---
 
 License
 
-This project is licensed under the MIT License. For details, see the LICENSE file.
+This project is licensed under the MIT License. See the LICENSE file for details.
 
 
 ---
 
 Contact
-
-For questions or support, you can reach out via:
 
 GitHub: MasoudGB
 
@@ -181,6 +182,3 @@ Telegram: [Your Telegram Handle]
 
 
 ---
-
-Copy and paste this markdown into your GitHub repository’s README.md file. Let me know if you need further assistance!
-
