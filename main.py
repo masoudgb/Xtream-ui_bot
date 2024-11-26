@@ -140,9 +140,9 @@ def print_stylish_box():
 
     # Combine the parts with respective colors
     text = (
-        Fore.YELLOW + part1 + " " +
+        Fore.CYAN + part1 + " " +
         Fore.WHITE + part2 + " " +
-        Fore.YELLOW + part3
+        Fore.CYAN + part3
     )
     
     # Get terminal dimensions
