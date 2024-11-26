@@ -1,47 +1,57 @@
----
-
-Xtream-UI Bot
-
-A powerful bot using the Xtream-UI API to automatically post movie and series posters along with information from your Xtream-UI server directly to Telegram channels.
+مشکلی که در مورد عدم نمایش صحیح فرمت Markdown در GitHub یا هنگام کپی و پیست کردن رخ می‌دهد، معمولاً ناشی از تنظیمات مرورگر یا برنامه‌ای است که برای مشاهده محتوا استفاده می‌کنید. با این حال، برای اطمینان از نمایش صحیح، چند نکته و نسخه بهینه شده Markdown ارائه می‌شود.
 
 
 ---
 
-Features
+رفع مشکلات Markdown:
 
-Automatically posts movies and series added to your Xtream-UI server.
+1. استفاده از GitHub به‌عنوان رندر نهایی:
+Markdown به‌صورت استاندارد در GitHub بهترین نمایش را دارد. اگر لینک‌ها یا استایل درست نمایش داده نمی‌شوند:
 
-Fully customizable, including Telegram channels and posting intervals.
+حتماً فایل خود را با پسوند .md ذخیره کنید.
 
-Supports multiple channels with unique configurations.
-
-Effortlessly share your content with rich visual details.
-
+آن را در GitHub آپلود کنید و از همانجا مشاهده کنید.
 
 
----
 
-Requirements
+2. تنظیمات فونت در GitHub یا ویرایشگرها:
+اگر هنگام کپی و پیست متن به مرورگر یا یک ویرایشگر، قالب به هم می‌ریزد:
 
-Root Access: Required for installing and configuring the bot.
+اطمینان حاصل کنید که فرمت Markdown توسط ویرایشگر پشتیبانی می‌شود.
 
-Operating System: Ubuntu 20.04 or newer is recommended.
+از ویرایشگرهای Markdown مثل VSCode یا Typora برای بررسی استفاده کنید.
 
-Python: Python 3.x with pip installed.
+
 
 
 
 ---
 
-Installation
+نسخه نهایی Markdown:
+
+# Xtream-UI Bot
+
+**A bot to automatically post movie and series posters and information from Xtream-UI server to Telegram channels.**
+
+---
+
+## Features
+
+- Automatically posts newly added movies and series from your Xtream-UI server.
+- Highly customizable for posting intervals and Telegram channels.
+- Supports multiple channels with separate configurations.
+
+---
+
+## Installation
 
 1. Clone the repository:
 
-git clone https://github.com/masoudgb/Xtream-ui_bot.git /opt/xtream-ui_bot
-cd /opt/xtream-ui_bot
+   ```bash
+   git clone https://github.com/masoudgb/Xtream-ui_bot.git /opt/xtream-ui_bot
+   cd /opt/xtream-ui_bot
 
-
-2. Run the bot setup:
+2. Run the installation script:
 
 python3 main.py
 
@@ -52,133 +62,97 @@ python3 main.py
 
 Running the Bot
 
-To start the bot:
+To start the bot, execute:
 
 python3 /opt/xtream-ui_bot/main.py
 
-Manage the bot through its interactive menu.
-
 
 ---
 
-Menu Options
+Configuration
 
-1. Install Xtream-UI Bot: Set up the bot for the first time.
+Telegram Setup
 
+Provide these details during setup:
 
-2. Manage Xtream-UI Bot: Edit settings, channels, and post intervals.
-
-
-3. Update Xtream-UI Bot: Update to the latest version.
-
-
-4. Uninstall Xtream-UI Bot: Completely remove the bot.
-
-
-5. Exit: Exit the menu.
-
-
-
-
----
-
-Configuration Details
-
-Telegram Settings
-
-During installation, provide:
-
-Xtream-UI API URL: e.g., http://yourserver:8080
+Xtream-UI API URL: Example: http://yourserver:8080
 
 API Username and Password
 
-Telegram Bot Token: Create your bot via BotFather
+Telegram Bot Token: Get from BotFather
 
-Channel IDs: Add private or public channels.
+Channel IDs: Add public or private channels.
 
 
-Post Timing
+Default Posters
 
-Set specific intervals or times for posting content via the Manage Post Timing option.
+Configure fallback images for content missing custom covers.
 
-Default Cover Images
 
-Configure default covers for movies and series missing custom posters.
+---
+
+Automating the Bot
+
+Systemd Integration
+
+The bot includes a systemd service and timer:
+
+Service: Runs the bot.
+
+Timer: Automates posting at intervals (default: 30 minutes).
+
+
+Activated automatically during installation.
 
 
 ---
 
 Updating the Bot
 
-To update, choose the Update Xtream-UI Bot option in the menu. This pulls the latest code while keeping your settings intact.
+Run the following to update the bot:
+
+python3 /opt/xtream-ui_bot/update.py
 
 
 ---
 
-Uninstallation
+Troubleshooting
 
-To remove the bot:
+1. Incorrect Display on GitHub:
 
-1. Select the Uninstall Xtream-UI Bot option.
+Ensure your file has the .md extension.
 
-
-2. All services and files will be deleted.
-
+Open the file in GitHub to confirm proper formatting.
 
 
 
----
+2. Broken Links:
 
-System Requirements
+Check syntax:
 
-Required Python libraries are installed automatically, including:
+[Link Text](https://example.com)
 
-python-telegram-bot
 
-termcolor
 
-python-dotenv
+3. Font Issues:
 
-requests
+Use a Markdown-compatible editor (e.g., Typora, Obsidian, or VSCode).
+
+
 
 
 
 ---
 
-Automation (Systemd Service)
+Example Links in Markdown:
 
-The bot uses a systemd service and timer for automation:
+Xtream-UI GitHub
 
-Service: Runs the bot.
-
-Timer: Configures posting intervals (default: 30 minutes).
-
-
-These are activated during installation.
-
-
----
-
-Contributing
-
-Contributions are welcome! Open an issue or submit a pull request.
-
-
----
-
-License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-
----
-
-Contact
-
-GitHub: MasoudGB
-
-Telegram: [Your Telegram Handle]
+Telegram BotFather
 
 
 
 ---
+
+نکته: اگر پس از این، مشکل همچنان پابرجا بود، لطفاً نوع مرورگر یا ویرایشگری که استفاده می‌کنید را بفرمایید تا بررسی دقیق‌تر انجام شود.
+
