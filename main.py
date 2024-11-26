@@ -134,15 +134,35 @@ def main():
     """
     Main menu for the bot setup and management.
     """
+from colorama import Fore, Style
+
 def print_stylish_box():
+    """
+    Prints a stylish box with text centered inside.
+    """
     text = "xtream-ui bot powered by masoud_gb"
     box_width = len(text) + 4  # Width of the box (2 padding spaces on each side)
-    border_char = "═"
-    corner_char = "╔", "╗", "╚", "╝"
     
-    print(Fore.CYAN + corner_char + border_chart)
+    # Box characters
+    top_left = "╔"
+    top_right = "╗"
+    bottom_left = "╚"
+    bottom_right = "╝"
+    horizontal = "═"
+    vertical = "║"
 
-# forcing style end
+    # Print the top border
+    print(Fore.CYAN + top_left + (horizontal * box_width) + top_right)
+    
+    # Print the text line with padding
+    print(vertical + " " + text.center(box_width - 2) + " " + vertical)
+    
+    # Print the bottom border
+    print(bottom_left + (horizontal * box_width) + bottom_right)
+    print(Style.RESET_ALL)  # Reset color styles
+
+# Call the function to test
+print_stylish_box()
     
     # Display options with green text and white numbers
     print(Fore.WHITE + "1." + Fore.GREEN + " Install xtream-ui bot")
