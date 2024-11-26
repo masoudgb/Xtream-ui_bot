@@ -12,17 +12,15 @@ from config.config import API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHANNELS
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
-# Path to the JSON files
-JSON_DIR = "json"
-VOD_FILE = os.path.join(JSON_DIR, "vod_ids.json")
-SERIES_FILE = os.path.join(JSON_DIR, "series_ids.json")
+# Path to the core directory for JSON files
+CORE_DIR = "/opt/xtream-ui_bot/core"
+VOD_FILE = os.path.join(CORE_DIR, "vod_ids.json")
+SERIES_FILE = os.path.join(CORE_DIR, "series_ids.json")
 
 def initialize_json_file(file_path):
     """
-    Creates a JSON file if it doesn't exist.
+    Creates a JSON file in the specified directory if it doesn't exist.
     """
-    if not os.path.exists(JSON_DIR):
-        os.makedirs(JSON_DIR)  # Create the folder if it doesn't exist
     if not os.path.exists(file_path):
         with open(file_path, "w") as f:
             json.dump([], f)  # Save an empty list to the file
@@ -110,6 +108,10 @@ if __name__ == "__main__":
     - Sends Series information to all channels.
     - Logs and prints operation status.
     """
+    # Ensure the core directory exists
+    if not os.path.exists(CORE_DIR):
+        os.makedirs(CORE_DIR)
+    
     # Send VOD information to all channels
     logging.info("Checking and sending new films to channels...")
     send_to_all_channels_for_vod()
