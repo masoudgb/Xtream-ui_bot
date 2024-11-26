@@ -1,7 +1,7 @@
 import os
 import shutil
 import subprocess
-from colorama import Fore, Style
+from colorama import Fore, Style, init
 
 init(autoreset=True)
 
@@ -142,7 +142,7 @@ def print_stylish_box():
     
     print(Fore.CYAN + corner_char + border_chart)
 
-forcing style end
+# forcing style end
     
     # Display options with green text and white numbers
     print(Fore.WHITE + "1." + Fore.GREEN + " Install xtream-ui bot")
