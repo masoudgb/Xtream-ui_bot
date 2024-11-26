@@ -223,13 +223,17 @@ def manage_bot():
     print(Fore.WHITE + "Manage xtream-ui bot:")
     print(Fore.WHITE + "1." + Fore.GREEN + " Manage Channels")
     print(Fore.WHITE + "2." + Fore.GREEN + " Manage Post Timing")
-    
+    print(Fore.WHITE + "3." + Fore.GREEN + " Back")
+
     choice = input(Fore.WHITE + "Choose an option: ")
-    
+
     if choice == "1":
         manage_channels()
     elif choice == "2":
         manage_post_timing()
+    elif choice == "3":
+        print(Fore.WHITE + "Returning to the previous menu.")
+        main()
     else:
         print(Fore.RED + "Invalid option, returning to main menu.")
         main()
