@@ -1,7 +1,7 @@
 import os
 import shutil
 import subprocess
-from colorama import Fore, init
+from colorama import Fore, init, Style
 
 init(autoreset=True)
 
@@ -134,7 +134,15 @@ def main():
     """
     Main menu for the bot setup and management.
     """
-    print(Fore.CYAN + "xtream-ui bot powered by masoud_gb")
+def print_stylish_box():
+    text = "xtream-ui bot powered by masoud_gb"
+    box_width = len(text) + 4  # Width of the box (2 padding spaces on each side)
+    border_char = "═"
+    corner_char = "╔", "╗", "╚", "╝"
+    
+    print(Fore.CYAN + corner_char + border_chart)
+
+forcing style end
     
     # Display options with green text and white numbers
     print(Fore.WHITE + "1." + Fore.GREEN + " Install xtream-ui bot")
