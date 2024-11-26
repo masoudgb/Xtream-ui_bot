@@ -166,9 +166,7 @@ def main():
     print(Fore.WHITE + "4." + Fore.GREEN + " Uninstall")
     print(Fore.WHITE + "5." + Fore.GREEN + " Exit")
     print(Style.RESET_ALL)
-
-    main()
-
+    
     # Get user input
     choice = input(Fore.WHITE + "Please choose an option: ")
     
