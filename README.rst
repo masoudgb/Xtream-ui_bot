@@ -125,5 +125,4 @@ Contact
 
 For questions or support, you can reach out via:
 
-- **GitHub**: MasoudGB  (https://github.com/masoudgb)
-- **Telegram**: [Your Telegram Handle]
+- **GitHub**: `MasoudGB <https://github.com/masoudgb>`_
