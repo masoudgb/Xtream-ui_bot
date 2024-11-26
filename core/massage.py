@@ -1,4 +1,6 @@
 import logging
+import sys
+sys.path.append('/opt/xtream-ui_bot/')
 from core.vod_handler import check_and_notify_new_vod
 from core.series_handler import check_and_notify_new_series
 from config.config import API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHANNELS
