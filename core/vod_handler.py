@@ -8,7 +8,7 @@ from config.config import DEFAULT_VOD_COVER_URL  # Importing default cover for V
 from config.config import CHANNELS  # Importing channels from config
 
 # Path to the JSON file for storing sent movie IDs
-MOVIES_FILE = "/opt/xtream-ui_bot/core/movies.json"
+MOVIES_FILE = "/opt/xtream-ui_bot/movies.json"
 
 # Temporary set to store sent movie IDs
 temp_sent_movie_ids = set()
