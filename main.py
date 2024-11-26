@@ -139,13 +139,13 @@ def shadow_box():
     print(f"  ▌{text}{' ' * (box_width - len(text) - 1)}▐")
     print(f"  ▀{'▄' * (box_width - 1)}▀")
     shadow_box()
+    print("\n" * 1)
 
 # Main menu
 def main():
     """
     Main menu for the bot setup and management.
     """
-    print("\n" * 1)
     
     # Display options with green text and white numbers
     print(Fore.WHITE + "1." + Fore.GREEN + " Install xtream-ui bot")
