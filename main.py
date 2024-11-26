@@ -129,12 +129,6 @@ def install_bot():
     # Return to the main menu after installation
     main()
 
-# Main menu
-def main():
-    """
-    Main menu for the bot setup and management.
-    """
-
 def print_stylish_box():
     """
     Prints a stylish box with text centered inside.
@@ -154,14 +148,16 @@ def print_stylish_box():
     print(Fore.CYAN + top_left + (horizontal * box_width) + top_right)
     
     # Print the text line with padding
-    print(vertical + " " + text.center(box_width - 2) + " " + vertical)
+    print(Fore.CYAN + vertical + " " + text.center(box_width - 2) + " " + vertical)
     
     # Print the bottom border
-    print(bottom_left + (horizontal * box_width) + bottom_right)
-    print(Style.RESET_ALL)  # Reset color styles
+    print(Fore.CYAN + bottom_left + (horizontal * box_width) + bottom_right)
 
-# Call the function to test
-print_stylish_box()
+def main():
+    """
+    Main menu for the bot setup and management.
+    """
+    print_stylish_box()
     
     # Display options with green text and white numbers
     print(Fore.WHITE + "1." + Fore.GREEN + " Install xtream-ui bot")
@@ -169,6 +165,9 @@ print_stylish_box()
     print(Fore.WHITE + "3." + Fore.GREEN + " Update xtream-ui bot")
     print(Fore.WHITE + "4." + Fore.GREEN + " Uninstall")
     print(Fore.WHITE + "5." + Fore.GREEN + " Exit")
+    print(Style.RESET_ALL)
+
+    main()
     
     # Get user input
     choice = input(Fore.WHITE + "Please choose an option: ")
