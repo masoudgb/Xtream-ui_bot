@@ -41,8 +41,8 @@ def write_json(file_path, data):
 
 def send_to_all_channels_for_vod():
     """
-    Sends VOD (Video On Demand) information to all specified Telegram channels.
-    Only new VOD IDs that are not already sent are processed.
+    Handles sending VOD (Video On Demand) information to all specified Telegram channels.
+    If the JSON file is empty (first run), only saves the data without sending.
     """
     try:
         # Initialize the JSON file
@@ -52,28 +52,33 @@ def send_to_all_channels_for_vod():
         sent_vod_ids = set(read_json(VOD_FILE))
         
         # Fetch new VOD IDs
-        new_vod_ids = check_and_notify_new_vod(API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHANNELS)
+        new_vod_ids = set(check_and_notify_new_vod(API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHANNELS))
         
-        # Identify VOD IDs that are not yet sent
-        to_send_vod_ids = [vod_id for vod_id in new_vod_ids if vod_id not in sent_vod_ids]
-        
-        # Send VODs to channels
-        for vod_id in to_send_vod_ids:
-            logging.info(f"Sending VOD ID {vod_id}...")
-            # Implement Telegram message sending here
-        
-        # Update the JSON file with new VOD IDs after sending
-        sent_vod_ids.update(to_send_vod_ids)
-        write_json(VOD_FILE, list(sent_vod_ids))
-        
-        print(colored("Success: Film data sent to all channels.", 'cyan'))
+        if not sent_vod_ids:
+            # First run: Save new VOD IDs and do not send any data
+            logging.info("First run detected. Saving VOD IDs without sending.")
+            write_json(VOD_FILE, list(new_vod_ids))
+            print(colored("First run: VOD IDs saved. No data sent to channels.", 'yellow'))
+        else:
+            # Identify VOD IDs that are not yet sent
+            to_send_vod_ids = new_vod_ids - sent_vod_ids
+            
+            # Send VODs to channels
+            for vod_id in to_send_vod_ids:
+                logging.info(f"Sending VOD ID {vod_id}...")
+                # Implement Telegram message sending here
+            
+            # Update the JSON file with new VOD IDs after sending
+            sent_vod_ids.update(to_send_vod_ids)
+            write_json(VOD_FILE, list(sent_vod_ids))
+            print(colored("Success: Film data sent to all channels.", 'cyan'))
     except Exception as e:
         print(colored(f"Failure: Failed to send film data. Error: {str(e)}", 'red'))
 
 def send_to_all_channels_for_series():
     """
-    Sends Series information to all specified Telegram channels.
-    Only new Series IDs that are not already sent are processed.
+    Handles sending Series information to all specified Telegram channels.
+    If the JSON file is empty (first run), only saves the data without sending.
     """
     try:
         # Initialize the JSON file
@@ -83,21 +88,26 @@ def send_to_all_channels_for_series():
         sent_series_ids = set(read_json(SERIES_FILE))
         
         # Fetch new Series IDs
-        new_series_ids = check_and_notify_new_series(API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHANNELS)
+        new_series_ids = set(check_and_notify_new_series(API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHANNELS))
         
-        # Identify Series IDs that are not yet sent
-        to_send_series_ids = [series_id for series_id in new_series_ids if series_id not in sent_series_ids]
-        
-        # Send Series to channels
-        for series_id in to_send_series_ids:
-            logging.info(f"Sending Series ID {series_id}...")
-            # Implement Telegram message sending here
-        
-        # Update the JSON file with new Series IDs after sending
-        sent_series_ids.update(to_send_series_ids)
-        write_json(SERIES_FILE, list(sent_series_ids))
-        
-        print(colored("Success: Series data sent to all channels.", 'cyan'))
+        if not sent_series_ids:
+            # First run: Save new Series IDs and do not send any data
+            logging.info("First run detected. Saving Series IDs without sending.")
+            write_json(SERIES_FILE, list(new_series_ids))
+            print(colored("First run: Series IDs saved. No data sent to channels.", 'yellow'))
+        else:
+            # Identify Series IDs that are not yet sent
+            to_send_series_ids = new_series_ids - sent_series_ids
+            
+            # Send Series to channels
+            for series_id in to_send_series_ids:
+                logging.info(f"Sending Series ID {series_id}...")
+                # Implement Telegram message sending here
+            
+            # Update the JSON file with new Series IDs after sending
+            sent_series_ids.update(to_send_series_ids)
+            write_json(SERIES_FILE, list(sent_series_ids))
+            print(colored("Success: Series data sent to all channels.", 'cyan'))
     except Exception as e:
         print(colored(f"Failure: Failed to send series data. Error: {str(e)}", 'red'))
 
