@@ -137,28 +137,25 @@ def print_stylish_box():
     box_width = len(text) + 4  # Add padding for the vertical bars
 
     # Box characters
-    top_left = "╔"
-    top_right = "╗"
-    bottom_left = "╚"
-    bottom_right = "╝"
-    horizontal = "═"
-    vertical = "║"
+    top_border = "╔" + "═" * (box_width - 2) + "╗"
+    bottom_border = "╚" + "═" * (box_width - 2) + "╝"
+    vertical_border = "║"
 
     # Print the top border
-    print(Fore.WHITE + top_left + (horizontal * box_width) + top_right)
+    print(Fore.WHITE + top_border)
 
     # Print the empty line above the text for padding
-    print(Fore.WHITE + vertical + " " * (box_width - 2) + vertical)  # Padding above the text
+    print(Fore.WHITE + vertical_border + " " * (box_width - 2) + vertical_border)  # Padding above the text
 
     # Center the text inside the box, making sure the length of spaces is correct
     text_spaces = (box_width - 2 - len(text)) // 2  # Calculate space needed on the left side
-    print(Fore.WHITE + vertical + " " * text_spaces + text + " " * text_spaces + vertical)
+    print(Fore.WHITE + vertical_border + " " * text_spaces + text + " " * (box_width - 2 - len(text) - text_spaces) + vertical_border)
 
     # Print the empty line below the text for padding
-    print(Fore.WHITE + vertical + " " * (box_width - 2) + vertical)  # Padding below the text
+    print(Fore.WHITE + vertical_border + " " * (box_width - 2) + vertical_border)  # Padding below the text
 
     # Print the bottom border
-    print(Fore.WHITE + bottom_left + (horizontal * box_width) + bottom_right)
+    print(Fore.WHITE + bottom_border)
 
 # Main menu
 def main():
