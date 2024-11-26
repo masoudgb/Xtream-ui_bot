@@ -138,14 +138,13 @@ def shadow_box():
     print(Fore.WHITE + f"  {'▄' * box_width}")
     print(f"  ▌{text}{' ' * (box_width - len(text) - 1)}▐")
     print(f"  ▀{'▄' * (box_width - 1)}▀")
-
+    shadow_box()
 
 # Main menu
 def main():
     """
     Main menu for the bot setup and management.
     """
-    shadow_box()
     print("\n" * 1)
     
     # Display options with green text and white numbers
