@@ -7,7 +7,7 @@ from core.telegram import send_photo_to_telegram
 from config.config import DEFAULT_SERIES_COVER_URL  # Importing default cover from config.py
 
 # Path to the JSON file for storing sent series data
-SERIES_FILE = "series.json"
+SERIES_FILE = "/opt/xtream-ui_bot/core/series.json"
 
 # Load sent series data from the JSON file
 def load_sent_series():
