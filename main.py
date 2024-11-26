@@ -1,7 +1,7 @@
 import os
 import shutil
 import subprocess
-from colorama import Fore, Style, init
+from colorama import Fore, init
 
 init(autoreset=True)
 
@@ -134,6 +134,7 @@ def main():
     """
     Main menu for the bot setup and management.
     """
+
 def print_stylish_box():
     """
     Prints a stylish box with text centered inside.
@@ -428,7 +429,7 @@ def update_bot():
 # Unistall
 def uninstall_bot():
     # Confirm uninstallation
-    confirmation = input(Fore.YELLOW + "Are you sure you want to uninstall xtream-ui bot? (y/n): ").strip().lower()
+    confirmation = input(Fore.RED + "Are you sure you want to uninstall xtream-ui bot? (y/n): ").strip().lower()
     if confirmation != "y":
         print(Fore.YELLOW + "Uninstallation cancelled.")
         main()
