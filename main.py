@@ -130,23 +130,17 @@ def install_bot():
     main() 
 
 def print_stylish_box():
-    # متن به همراه رنگ‌بندی
-    text = f"{Fore.LIGHTCYAN_EX}xtream-ui bot powered by masoud_gb"
-
-    # محاسبه طول متن و عرض کادر
-    text_length = len(Fore.RESET + text)  # طول متن شامل رنگ‌ها را حذف می‌کنیم
-    box_width = text_length + 4  # طول کادر با 2 فضای خالی از هر طرف
-
-    # ساخت کادر
+    text = f"{Fore.LIGHTCYAN_EX}xtream-ui bot powered by masoud_gb{Fore.RESET}"
+    text_length = len("xtream-ui bot powered by masoud_gb")
+    box_width = text_length + 4
     top_border = f"╔{'═' * box_width}╗"
     bottom_border = f"╚{'═' * box_width}╝"
-    padding_line = f"║{' ' * box_width}║"  # خطوط خالی
+    padding_line = f"║{' ' * box_width}║"
 
-    # چاپ کادر
     print(Fore.WHITE + top_border)
-    print(padding_line)  # خط خالی بالای متن
-    print(f"║  {text}{Fore.WHITE}  ║")  # متن با فاصله از لبه‌ها
-    print(padding_line)  # خط خالی پایین متن
+    print(padding_line)
+    print(f"║  {text}{Fore.WHITE}  ║")
+    print(padding_line)
     print(bottom_border)
 
 # Main menu
