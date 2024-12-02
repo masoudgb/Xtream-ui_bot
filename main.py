@@ -228,24 +228,42 @@ def manage_channels():
         print(Fore.RED + "Invalid option, returning to manage menu.")
         manage_bot()
 
+# Path to the .env file
+ENV_FILE_PATH = '/opt/xtream-ui_bot/.env'
+
 # 1.1 Add Channel
 def add_channel():
+    """
+    Adds a new channel to the .env file. Checks if the channel ID is already present
+    to avoid duplicates.
+    """
     # Read current channel index from the .env file
     channel_index = 1
+    existing_channels = set()  # To track existing channel IDs
+    
     try:
-        with open('.env', 'r') as env_file:
+        with open(ENV_FILE_PATH, 'r') as env_file:
             for line in env_file:
-                if line.startswith(f"CHANNEL_{channel_index}_ID="):
+                if line.startswith("CHANNEL_") and "_ID=" in line:
+                    # Extract the existing channel ID and add it to the set
+                    existing_channels.add(line.split('=')[1].strip())
                     channel_index += 1
     except FileNotFoundError:
         print(Fore.YELLOW + ".env file not found. It will be created.")
     
-    # Get channel information from user
-    channel_id = input(Fore.WHITE + "Enter Channel ID (e.g., @mychannel): ")
-    channel_link = input(Fore.WHITE + "Enter Channel Link (e.g., https://t.me/mychannel): ")
+    # Get channel information from the user
+    channel_id = input(Fore.WHITE + "Enter Channel ID (e.g., @mychannel): ").strip()
+    
+    # Check if the channel ID is already in the .env file
+    if channel_id in existing_channels:
+        print(Fore.YELLOW + "Channel ID already exists.")
+        return  # Stop further processing
+    
+    channel_link = input(Fore.WHITE + "Enter Channel Link (e.g., https://t.me/mychannel): ").strip()
     
     # Append channel information to the .env file
-    with open('.env', 'a') as env_file:
+    os.makedirs(os.path.dirname(ENV_FILE_PATH), exist_ok=True)  # Ensure directories exist
+    with open(ENV_FILE_PATH, 'a') as env_file:
         env_file.write(f"CHANNEL_{channel_index}_ID={channel_id}\n")
         env_file.write(f"CHANNEL_{channel_index}_LINK={channel_link}\n")
     
@@ -254,21 +272,40 @@ def add_channel():
 
 # 1.2 Stop sending to a channel
 def stop_channel():
+    """
+    Stops sending messages to a specified channel.
+    """
     modify_channel_status("stop")
 
 # 1.3 Resume sending to a channel
 def resume_channel():
+    """
+    Resumes sending messages to a specified channel.
+    """
     modify_channel_status("resume")
 
 # 1.4 Remove a channel
 def remove_channel():
+    """
+    Removes a channel from the .env file.
+    """
     modify_channel_status("remove")
 
 # Modify channel status (stop, resume, or remove)
 def modify_channel_status(action):
+    """
+    Modifies the status of a channel (stop, resume, or remove).
+    
+    Parameters:
+    action (str): The action to perform on the channel (e.g., "stop", "resume", "remove").
+    """
     channels = {}
-    with open('.env', 'r') as env_file:
-        lines = env_file.readlines()
+    try:
+        with open(ENV_FILE_PATH, 'r') as env_file:
+            lines = env_file.readlines()
+    except FileNotFoundError:
+        print(Fore.RED + ".env file not found.")
+        return
     
     # Collect channels from the .env file
     for line in lines:
@@ -278,15 +315,23 @@ def modify_channel_status(action):
             channels[key] = channel_id
     
     # Display available channels
+    if not channels:
+        print(Fore.RED + "No channels found.")
+        return
+    
     print(Fore.GREEN + "Available Channels:")
     for idx, (key, channel_id) in enumerate(channels.items(), start=1):
         print(Fore.WHITE + f"{idx}." + Fore.GREEN + f" {channel_id}")
     
-    choice = int(input(Fore.WHITE + "Select a channel by number: "))
-    selected_key = list(channels.keys())[choice - 1]
+    try:
+        choice = int(input(Fore.WHITE + "Select a channel by number: "))
+        selected_key = list(channels.keys())[choice - 1]
+    except (IndexError, ValueError):
+        print(Fore.RED + "Invalid choice.")
+        return
     
     # Edit channels based on the selected action
-    with open('.env', 'w') as env_file:
+    with open(ENV_FILE_PATH, 'w') as env_file:
         for line in lines:
             if action == "remove" and selected_key in line:
                 continue
