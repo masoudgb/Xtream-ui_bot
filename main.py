@@ -347,53 +347,56 @@ def modify_channel_status(action):
 
 # Post timing management
 def manage_post_timing():
-    interval = input(Fore.WHITE + "Enter post interval in minutes (default is 30): ") or "30"
-    start_time = input(Fore.WHITE + "Enter start time (HH:mm, default is 08:00): ") or "08:00"
-    end_time = input(Fore.WHITE + "Enter end time (HH:mm, default is 24:00): ") or "24:00"
+    """
+    Manages post timing by creating a cron job instead of systemd service and timer files.
+    Restarts the cron service after the new cron job is added.
+    """
+    # Get timing configuration from the user
+    interval = input(Fore.WHITE + "Enter post interval in minutes (e.g., 30): ").strip()
+    if not interval.isdigit() or int(interval) <= 0:
+        print(Fore.RED + "Invalid interval. Please enter a positive number.")
+        return
     
-    # Create service file
-    service_content = f"""[Unit]
-Description=Run Xtream UI Bot Script
-After=network.target
-
-[Service]
-WorkingDirectory=/opt/xtream-ui_bot/core
-ExecStart=/usr/bin/python3 massage.py
-Environment="PATH=/usr/bin:/usr/local/bin"
-Restart=on-failure
-User=root
-Group=root
-
-[Install]
-WantedBy=multi-user.target
-"""
-    with open("/etc/systemd/system/xtream-ui_bot.service", 'w') as service_file:
-        service_file.write(service_content)
+    interval = int(interval)
+    start_time = input(Fore.WHITE + "Enter start time (HH:mm, default is 08:00): ").strip() or "08:00"
+    end_time = input(Fore.WHITE + "Enter end time (HH:mm, default is 23:59): ").strip() or "23:59"
     
-    # Create timer file
-    timer_content = f"""[Unit]
-Description=Run Xtream UI Bot Script every {interval} minutes between {start_time} and {end_time}
+    # Validate start and end times
+    try:
+        start_hour, start_minute = map(int, start_time.split(":"))
+        end_hour, end_minute = map(int, end_time.split(":"))
+        if not (0 <= start_hour < 24 and 0 <= start_minute < 60 and 0 <= end_hour < 24 and 0 <= end_minute < 60):
+            raise ValueError
+    except ValueError:
+        print(Fore.RED + "Invalid time format. Please enter times in HH:mm format.")
+        return
 
-[Timer]
-Unit=xtream-ui_bot.service
-OnBootSec=5min
-OnUnitActiveSec={interval}min
-Persistent=true
-
-[Install]
-WantedBy=timers.target
-"""
-    with open("/etc/systemd/system/xtream-ui_bot.timer", 'w') as timer_file:
-        timer_file.write(timer_content)
+    # Create cron expression
+    cron_jobs = []
+    for hour in range(start_hour, end_hour + 1):
+        if hour == start_hour:
+            # First hour: Start from the specified minute
+            cron_jobs.append(f"{start_minute}/{interval} {hour} * * * /usr/bin/python3 /opt/xtream-ui_bot/core/massage.py")
+        elif hour == end_hour:
+            # Last hour: Stop at the specified minute
+            cron_jobs.append(f"0/{interval} {hour} * * * /usr/bin/python3 /opt/xtream-ui_bot/core/massage.py")
+        else:
+            # Full hours in between
+            cron_jobs.append(f"0/{interval} {hour} * * * /usr/bin/python3 /opt/xtream-ui_bot/core/massage.py")
     
-    # Reload and enable systemd services
-    os.system("systemctl daemon-reload")
-    os.system("systemctl enable xtream-ui_bot.timer")
-    os.system("systemctl start xtream-ui_bot.timer")
+    # Add the cron job(s) to the crontab
+    cron_job_content = "\n".join(cron_jobs)
+    with open("/tmp/xtream-ui_bot_cron", "w") as cron_file:
+        cron_file.write(cron_job_content + "\n")
     
-    print(Fore.GREEN + "Post timing management configured successfully.")
+    os.system("crontab /tmp/xtream-ui_bot_cron")
+    os.remove("/tmp/xtream-ui_bot_cron")  # Cleanup temporary file
+    
+    # Restart cron service
+    os.system("systemctl restart cron")
+    
+    print(Fore.GREEN + "Cron job created and cron service restarted successfully.")
     manage_bot()
-    
     main()
 
 # Update script
