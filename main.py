@@ -443,8 +443,11 @@ def update_bot():
             os.rename('.env_backup', '.env')
     main()
 
-# Unistall
+# Uninstall
 def uninstall_bot():
+    """
+    Uninstalls the xtream-ui bot, including removing its cron jobs, files, and directories.
+    """
     # Confirm uninstallation
     confirmation = input(Fore.RED + "Are you sure you want to uninstall xtream-ui bot? (y/n): ").strip().lower()
     if confirmation != "y":
@@ -455,27 +458,19 @@ def uninstall_bot():
     try:
         print(Fore.RED + "Uninstalling xtream-ui bot...")
 
-        # Stop and disable the systemd service if it exists
-        service_name = "xtream-ui_bot.service"
-        timer_name = "xtream-ui_bot.timer"
-
-        print(Fore.YELLOW + "Stopping and disabling the bot service...")
-        subprocess.run(['systemctl', 'stop', service_name], check=False)
-        subprocess.run(['systemctl', 'disable', service_name], check=False)
-        subprocess.run(['systemctl', 'stop', timer_name], check=False)
-        subprocess.run(['systemctl', 'disable', timer_name], check=False)
-
-        # Remove the service and timer files
-        print(Fore.YELLOW + "Removing service and timer files...")
-        service_file_path = f"/etc/systemd/system/{service_name}"
-        timer_file_path = f"/etc/systemd/system/{timer_name}"
-        if os.path.exists(service_file_path):
-            os.remove(service_file_path)
-        if os.path.exists(timer_file_path):
-            os.remove(timer_file_path)
-
-        # Reload systemd daemon
-        subprocess.run(['systemctl', 'daemon-reload'], check=False)
+        # Remove cron jobs related to xtream-ui_bot
+        print(Fore.YELLOW + "Removing cron jobs for xtream-ui_bot...")
+        # Read existing crontab
+        current_crontab = subprocess.run(['crontab', '-l'], stdout=subprocess.PIPE, text=True, check=False).stdout
+        # Filter out lines related to xtream-ui_bot
+        updated_crontab = "\n".join(
+            [line for line in current_crontab.splitlines() if "/opt/xtream-ui_bot/core/massage.py" not in line]
+        )
+        # Update crontab
+        with open("/tmp/xtream-ui_bot_cron_uninstall", "w") as cron_file:
+            cron_file.write(updated_crontab + "\n")
+        subprocess.run(['crontab', '/tmp/xtream-ui_bot_cron_uninstall'], check=False)
+        os.remove("/tmp/xtream-ui_bot_cron_uninstall")  # Cleanup temporary file
 
         # Remove the bot directory
         bot_directory = "/opt/xtream-ui_bot"
@@ -497,7 +492,6 @@ def uninstall_bot():
         print(Fore.RED + f"Error during uninstallation: {str(e)}")
 
     main()
-
 # Exit
 def exit_program():
     print(Fore.GREEN + "Exiting...")
