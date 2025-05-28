@@ -6,17 +6,17 @@ from core.api_client import get_series_data, get_series_info, get_categories
 from core.telegram import send_photo_to_telegram
 from config.config import DEFAULT_SERIES_COVER_URL  # Importing default cover from config.py
 
-# Path to the JSON file for storing sent series data
+# Path to the JSON file for storing sent series information
 SERIES_FILE = "/opt/xtream-ui_bot/core/series.json"
 
-# Load sent series data from the JSON file
+# Load sent series information from the JSON file
 def load_sent_series():
     if os.path.exists(SERIES_FILE):
         with open(SERIES_FILE, "r", encoding="utf-8") as file:
             return json.load(file)
     return {}
 
-# Save sent series data to the JSON file
+# Save sent series information to the JSON file
 def save_sent_series(sent_series):
     with open(SERIES_FILE, "w", encoding="utf-8") as file:
         json.dump(sent_series, file, ensure_ascii=False, indent=4)
@@ -26,64 +26,72 @@ def send_to_telegram_with_retry(image_url, caption, TELEGRAM_TOKEN, CHANNEL_ID, 
     for attempt in range(1, retries + 1):
         try:
             send_photo_to_telegram(image_url, caption, TELEGRAM_TOKEN, CHANNEL_ID, parse_mode="HTML")
-            return True  # Successfully sent
+            return True  # Sent successfully
         except Exception as e:
-            logging.error(f"Failed to send to Telegram (Attempt {attempt}/{retries}): {e}")
-            time.sleep(5)  # Pause between retries
+            logging.error(f"Error sending to Telegram (attempt {attempt}/{retries}): {e}")
+            time.sleep(5)  # Pause between attempts
     return False  # Failed after all retries
 
-# Compare new episodes and notify
+# Compare episodes and send notifications
 def compare_and_notify(series_id, series_name, new_episodes, old_episodes, series_cover, category_name, TELEGRAM_TOKEN, CHANNELS, sent_series):
     is_new = False
-    series_updates = {}  # Store updates for later saving after notifying all channels
+    series_updates = {}  # Store updates for saving after sending
 
     if not isinstance(new_episodes, dict):
-        logging.error(f"Invalid new_episodes format for series ID {series_id}. Expected dict, got {type(new_episodes)}.")
+        logging.error(f"Invalid format for new episodes of series {series_id}. Expected dict, got {type(new_episodes)}.")
         return is_new
 
     for season_num, episodes in new_episodes.items():
         if not isinstance(episodes, list):
-            logging.error(f"Invalid episodes format for season {season_num}. Expected list, got {type(episodes)}.")
+            logging.error(f"Invalid format for episodes of season {season_num}. Expected list, got {type(episodes)}.")
             continue
 
         old_season_episodes = old_episodes.get(str(season_num), [])
+        new_episode_nums = [ep.get("episode_num") for ep in episodes if ep.get("episode_num") not in old_season_episodes]
 
-        for episode in episodes:
-            episode_num = episode.get("episode_num")
-            if episode_num in old_season_episodes:
-                continue  # Already sent
+        if not new_episode_nums:
+            continue  # No new episodes
 
-            # Episode details
-            episode_title = episode.get("title", "Untitled")
-            episode_duration = episode.get("info", {}).get("duration", "N/A")
-            episode_rating = episode.get("info", {}).get("rating", "n/a")
-            episode_rating = f"{episode_rating}/10" if episode_rating and episode_rating != "n/a" else "n/a"
+        # Prepare caption information
+        season_is_new = str(season_num) not in old_episodes
+        episode_count = len(new_episode_nums)
 
-            for channel in CHANNELS:
-                channel_link = channel.get("link", "#")
-                caption = (
-                    f"🎬 <b>Episode {episode_num} of Season {season_num} from the series {series_name} is now available!</b>\n\n"
-                    f"📌 Title: <b>{episode_title}</b>\n\n"
-                    f"🎭 Category: <b>{category_name}</b>\n\n"
-                    f"⏳ Duration: {episode_duration}\n\n"
-                    f"⭐ Rating: {episode_rating}\n\n\n"
-                    f"🔗 Channel Link: <a href='{channel_link}'>Here</a>"
-                )
+        if season_is_new:
+            episode_info = f"Season {season_num} with {episode_count} episode{'s' if episode_count > 1 else ''}"
+        elif episode_count == 1:
+            episode = next(ep for ep in episodes if ep.get("episode_num") == new_episode_nums[0])
+            episode_title = episode.get("title", "No Title")
+            episode_info = f"Episode {new_episode_nums[0]} of Season {season_num} ({episode_title})"
+        else:
+            episode_info = f"Episodes {min(new_episode_nums)} to {max(new_episode_nums)} of Season {season_num}"
 
-                # Use the series cover or default cover if none is available
-                series_image = series_cover if series_cover else DEFAULT_SERIES_COVER
+        for channel in CHANNELS:
+            channel_link = channel.get("link", "#")
+            rtl_character = "\u200F"
 
-                # Send to Telegram
-                if not send_to_telegram_with_retry(series_image, caption, TELEGRAM_TOKEN, channel["id"]):
-                    logging.error(f"Failed to send episode {episode_num} of season {season_num} for series ID {series_id} to channel {channel['id']}.")
-                    break
-            else:
-                is_new = True
-                if str(season_num) not in series_updates:
-                    series_updates[str(season_num)] = []
-                series_updates[str(season_num)].append(episode_num)
+            # Notification caption
+            caption = (
+                rtl_character +
+                f"🎬 <b>Update for {series_name}!</b>\n\n"
+                f"📌 {episode_info} added!\n\n"
+                f"🎭 Category: <b>{category_name}</b>\n\n"
+                f"🔗 Channel Link: <a href='{channel_link}'>Here</a>"
+            )
 
-    # Add updates to sent_series after notifying all channels
+            # Use series cover or default cover
+            series_image = series_cover if series_cover else DEFAULT_SERIES_COVER_URL
+
+            # Send to Telegram
+            if not send_to_telegram_with_retry(series_image, caption, TELEGRAM_TOKEN, channel["id"]):
+                logging.error(f"Failed to send update for season {season_num} of series {series_id} to channel {channel['id']}.")
+                break
+        else:
+            is_new = True
+            if str(season_num) not in series_updates:
+                series_updates[str(season_num)] = []
+            series_updates[str(season_num)].extend(new_episode_nums)
+
+    # Add updates to sent_series after sending to all channels
     for season_num, episodes in series_updates.items():
         if str(series_id) not in sent_series:
             sent_series[str(series_id)] = {"seasons": {}}
@@ -97,13 +105,13 @@ def compare_and_notify(series_id, series_name, new_episodes, old_episodes, serie
 def check_and_notify_new_series(API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHANNELS):
     is_first_run = not os.path.exists(SERIES_FILE)
 
-    # Load previously sent series data
+    # Load sent series information
     sent_series = load_sent_series()
 
     # Fetch categories
     categories = get_categories(API_URL, USERNAME, PASSWORD)
     if not categories:
-        logging.error("No categories data received.")
+        logging.error("No category data received.")
         return
 
     # Fetch series data
@@ -130,7 +138,7 @@ def check_and_notify_new_series(API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHA
                 old_episodes = sent_series.get(str(series_id), {}).get("seasons", {})
 
                 if is_first_run:
-                    # If it's the first run, just save the data
+                    # On first run, only store data
                     if str(series_id) not in sent_series:
                         sent_series[str(series_id)] = {"seasons": {}}
                     sent_series[str(series_id)]["seasons"] = {
@@ -141,7 +149,7 @@ def check_and_notify_new_series(API_URL, USERNAME, PASSWORD, TELEGRAM_TOKEN, CHA
                     # Compare and send notifications
                     compare_and_notify(series_id, series_name, new_episodes, old_episodes, series_cover, category_name, TELEGRAM_TOKEN, CHANNELS, sent_series)
             else:
-                logging.warning(f"No episodes found for series ID {series_id}.")
+                logging.warning(f"No episodes found for series {series_id}.")
     else:
         logging.error("No data received from API.")
 
